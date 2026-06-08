@@ -1,0 +1,21 @@
+# View Tools
+
+- `view_list`
+  - 说明：按 raw view query 参数列出 views。
+  - 必选参数：`params`。
+- `view_retrieve`
+  - 说明：读取 view。
+  - 必选参数：`view_id`。
+- `view_create`
+  - 说明：创建 view。
+  - 必选参数：`payload`。
+  - 可选参数：`dry_run`。
+- `view_update`
+  - 说明：更新 view。
+  - 必选参数：`view_id`、`payload`。
+  - 可选参数：`dry_run`。
+- `view_query`
+  - 说明：查询 view。
+  - 必选参数：`view_id`。
+  - 可选参数：`payload`。
+  - live 限制：取决于 Notion API/SDK 当前是否暴露 views 对象。

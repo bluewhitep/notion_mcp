@@ -1,0 +1,47 @@
+import json
+import uuid
+from pathlib import Path
+
+import pytest
+from typer.testing import CliRunner
+
+from notion_mcp.cli import app
+from notion_mcp.cli.commands import auth as auth_commands
+from tests.v2.fixtures.fake_notion import FakeNotionClient
+
+
+runner = CliRunner()
+
+
+def test_full_local_config_and_mock_auth_flow(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    user_id = str(uuid.uuid4())
+    monkeypatch.setenv("NOTION_MCP_CONFIG", str(tmp_path / "config.json"))
+
+    init_result = runner.invoke(
+        app,
+        [
+            "init",
+            "--token",
+            "secret-token",
+            "--user-name",
+            "Ada",
+            "--user-id",
+            user_id,
+            "--json",
+        ],
+    )
+    status_result = runner.invoke(app, ["status", "--json"])
+    monkeypatch.setattr(
+        auth_commands,
+        "create_notion_client",
+        lambda config: FakeNotionClient(user_id=user_id, user_name="Ada"),
+    )
+    auth_result = runner.invoke(app, ["auth", "validate", "--json"])
+
+    assert init_result.exit_code == 0
+    assert status_result.exit_code == 0
+    assert auth_result.exit_code == 0
+    assert json.loads(status_result.stdout)["configured"] is True
+    assert json.loads(auth_result.stdout)["valid"] is True

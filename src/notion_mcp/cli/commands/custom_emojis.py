@@ -1,0 +1,45 @@
+# File: src/notion_mcp/cli/commands/custom_emojis.py
+# Format: UTF-8
+# =============================
+# File Description:
+# CLI custom emoji commands backed by Core custom emoji service.
+# TAG: cli, custom-emojis
+# =============================
+
+from __future__ import annotations
+
+import typer
+
+from notion_mcp.core.errors import CoreError
+
+from ..core_services import get_custom_emojis_service as _get_custom_emojis_service
+from ..formatting import echo_json, exit_with_error
+
+app = typer.Typer(add_completion=False, help="Custom emoji operations")
+
+
+def register(root_app: typer.Typer) -> None:
+    root_app.add_typer(app, name="custom-emoji")
+    root_app.add_typer(app, name="custom-emojis")
+
+
+def get_custom_emojis_service():
+    return _get_custom_emojis_service()
+
+
+@app.command(name="list")
+def list_emojis(json_output: bool = typer.Option(False, "--json")) -> None:
+    try:
+        result = get_custom_emojis_service().list()
+    except CoreError as exc:
+        exit_with_error(exc, json_output=json_output)
+    echo_json(result) if json_output else typer.echo(result)
+
+
+@app.command(name="retrieve")
+def retrieve(custom_emoji_id: str, json_output: bool = typer.Option(False, "--json")) -> None:
+    try:
+        result = get_custom_emojis_service().retrieve(custom_emoji_id)
+    except CoreError as exc:
+        exit_with_error(exc, json_output=json_output)
+    echo_json(result) if json_output else typer.echo(result)

@@ -1,0 +1,68 @@
+# File: src/notion_mcp/mcp_server/tools/config.py
+# Format: UTF-8
+# =============================
+# File Description:
+# MCP tools for local configuration status and reads.
+# TAG: mcp, tools, config
+# =============================
+
+from __future__ import annotations
+
+from typing import Any
+
+from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
+
+from notion_mcp.core.config import load_core_config, redacted_config
+from notion_mcp.core.errors import ConfigNotFoundError, CoreError
+
+from .shared import core_error_payload
+
+
+# --------------------------------
+# Function Description:
+# Registers config MCP tools.
+# Inputs/Outputs:
+# Input FastMCP server; output is server with config tools.
+# Usage:
+# register(server)
+# --------------------------------
+def register(server: FastMCP) -> None:
+    @server.tool(
+        name="config_status",
+        description="Return local Notion MCP configuration status with token redacted.",
+        annotations=ToolAnnotations(readOnlyHint=True),
+    )
+    def config_status() -> dict[str, Any]:
+        try:
+            config = load_core_config()
+            public = redacted_config(config)
+            configured = True
+        except ConfigNotFoundError:
+            public = {}
+            configured = False
+        return {
+            "configured": configured,
+            "config": public,
+            "capabilities": {
+                "core": True,
+                "legacy_rest": True,
+                "mcp_server": True,
+            },
+        }
+
+    @server.tool(
+        name="config_get",
+        description="Read one local configuration key with token redacted by default.",
+        annotations=ToolAnnotations(readOnlyHint=True),
+    )
+    def config_get(key: str, show_secret: bool = False) -> dict[str, Any]:
+        try:
+            config = load_core_config()
+        except CoreError as exc:
+            return core_error_payload(exc)
+        if key == "notion_token" and not show_secret:
+            value: Any = "********" if config.notion_token else None
+        else:
+            value = getattr(config, key, None)
+        return {"key": key, "value": value}

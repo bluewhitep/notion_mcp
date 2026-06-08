@@ -1,0 +1,21 @@
+# File Upload Tools
+
+- `file_upload_create`
+  - 说明：创建 file upload object。
+  - 必选参数：`payload`。
+  - 可选参数：`dry_run`。
+- `file_upload_list`
+  - 说明：列出 file upload objects，支持分页。
+  - 可选参数：`page_size`、`start_cursor`。
+- `file_upload_retrieve`
+  - 说明：读取 file upload object。
+  - 必选参数：`file_upload_id`。
+- `file_upload_send`
+  - 说明：发送 file upload payload。
+  - 必选参数：`file_upload_id`、`payload`。
+  - 可选参数：`dry_run`。
+- `file_upload_complete`
+  - 说明：完成 file upload。
+  - 必选参数：`file_upload_id`。
+  - 可选参数：`payload`、`dry_run`。
+  - live 限制：需要真实文件和 Notion workspace 权限。
