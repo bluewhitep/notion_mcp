@@ -13,3 +13,5 @@ dist/
 .DS_Store
 .dev_docs/
 .private_docs/
+tests/v5/
+Docs/skills/test_copies/
