@@ -12,3 +12,4 @@ dist/
 *.egg-info/
 .DS_Store
 .dev_docs/
+.private_docs/

@@ -39,6 +39,33 @@ hatchling.build
 
 `fastapi` 和 `uvicorn` 当前用于 legacy REST 兼容入口。
 
+## Runtime Stack
+
+当前项目继续使用 Python，`pyproject.toml` 声明 `requires-python = ">=3.10"`。继续使用 Python 的原因是：
+
+- 现有代码和测试都是 Python。
+- Notion Python SDK 可复用。
+- MCP Python SDK 可直接实现本地 MCP server。
+- pytest、Typer、FastAPI 和 Pydantic 工具链已经存在。
+
+Notion SDK 由 Core client factory 统一创建，并集中注入：
+
+- bearer token
+- Notion API version
+- timeout
+- retry policy
+- fake client test double
+
+CLI、MCP Tool 和 legacy REST routes 不应直接创建 Notion SDK client。
+
+Notion API version 是全局配置项。当前默认目标版本为 `2026-03-11`，升级该版本时必须同步兼容性测试。
+
+MCP Python SDK 用于创建真正的 MCP server、注册 tools、暴露 tool schema 并处理 stdio / Streamable HTTP transport。
+
+Typer 是 CLI 框架；CLI 只调用 Core，支持普通文本输出、`--json` 输出和 `--dry-run`。
+
+Pydantic 用于配置模型和结构化输入输出。当前代码使用 Pydantic v2 API。
+
 开发验收依赖：
 
 - `pytest`

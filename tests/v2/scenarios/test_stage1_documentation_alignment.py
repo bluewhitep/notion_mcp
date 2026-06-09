@@ -18,20 +18,20 @@ def test_developer_and_user_doc_entrypoints_are_split() -> None:
     assert (REPO_ROOT / "Docs" / "User" / "MCP_Clients.md").is_file()
 
 
-def test_requirements_distinguish_legacy_prototype_from_target() -> None:
-    """Requirements must not present the legacy REST prototype as the final MCP server."""
-    requirements = read_doc("Docs/Requirements.md")
+def test_architecture_distinguishes_legacy_rest_from_target() -> None:
+    """Developer architecture docs must not present the legacy REST prototype as the final MCP server."""
+    architecture = read_doc("Docs/Developer/architecture/overview.md")
 
-    assert "已实现原型能力" in requirements
-    assert "待实现目标能力" in requirements
-    assert "FastAPI REST 原型" in requirements
-    assert "Core + CLI + MCP Tool" in requirements
-    assert "MCP Tool" in requirements
+    assert "Core" in architecture
+    assert "CLI" in architecture
+    assert "MCP Tool" in architecture
+    assert "legacy FastAPI REST" in architecture
+    assert "它不是最终 MCP 接口" in architecture
 
 
 def test_design_documents_core_cli_mcp_call_boundaries() -> None:
-    """Design docs must state that CLI and MCP both call Core."""
-    design = read_doc("Docs/Design.md")
+    """Architecture docs must state that CLI and MCP both call Core."""
+    design = read_doc("Docs/Developer/architecture/overview.md")
 
     assert "Core" in design
     assert "CLI" in design
@@ -42,8 +42,8 @@ def test_design_documents_core_cli_mcp_call_boundaries() -> None:
 
 
 def test_tech_stack_includes_uv_and_mcp_sdk() -> None:
-    """Tech stack must include uv and the MCP Python SDK as planned dependencies."""
-    tech_stack = read_doc("Docs/TechStack.md")
+    """Packaging docs must include uv and the MCP Python SDK as planned dependencies."""
+    tech_stack = read_doc("Docs/Developer/packaging.md")
 
     assert "uv" in tech_stack
     assert "mcp" in tech_stack
@@ -51,9 +51,13 @@ def test_tech_stack_includes_uv_and_mcp_sdk() -> None:
     assert "Notion API version" in tech_stack
 
 
-def test_development_plan_marks_current_plan_as_legacy_prototype() -> None:
-    """The old completion checklist must be labeled as legacy prototype scope."""
-    plan = read_doc("Docs/Development_Plan.md")
-
-    assert "legacy prototype" in plan
-    assert "开发文档目录" in plan
+def test_public_docs_do_not_keep_old_top_level_planning_files() -> None:
+    """Public Docs should not keep old top-level planning and private design files."""
+    for relative_path in [
+        "Docs/Requirements.md",
+        "Docs/Design.md",
+        "Docs/TechStack.md",
+        "Docs/Development_Plan.md",
+        "Docs/dev",
+    ]:
+        assert not (REPO_ROOT / relative_path).exists()
