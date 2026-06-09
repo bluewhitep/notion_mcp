@@ -18,6 +18,13 @@ live 测试默认跳过，不会在普通测试命令中访问 Notion。
   - 可选条件：`NOTION_MCP_LIVE_PARENT_PAGE_ID` 和 `NOTION_MCP_LIVE_DATA_SOURCE_ID`。
   - 如果未提供可选条件，测试会尝试读取当前项目 `.notion_mcp` 的 page/database attachment。
   - 覆盖链路：create -> read/compare -> update -> read/compare -> trash -> verify。
+- `tests/live/test_live_mcp_server_http_e2e.py`
+  - 默认跳过原因：会启动本地 MCP HTTP server，并在真实 Notion 测试 page/data source 中创建、修改、搜索和 trash 临时对象。
+  - 启用条件：`NOTION_MCP_LIVE_SERVER_E2E=1`。
+  - 可选条件：`NOTION_MCP_LIVE_PARENT_PAGE_ID` 和 `NOTION_MCP_LIVE_DATA_SOURCE_ID`。
+  - 如果未提供可选条件，测试会尝试读取当前项目 `.notion_mcp` 的 page/database attachment。
+  - 覆盖链路：server start -> JSON-RPC initialize -> tools/list -> create page/block/database entry -> read/compare -> search -> update -> read/compare -> trash -> verify -> server stop/remove。
+  - 该测试只通过 MCP HTTP tool call 验证 server 通路，不调用 CLI page/database/block 命令。
 
 ## 启用方式
 
@@ -35,6 +42,15 @@ NOTION_MCP_LIVE_E2E=1 \
 NOTION_MCP_LIVE_PARENT_PAGE_ID=<test_page_id> \
 NOTION_MCP_LIVE_DATA_SOURCE_ID=<test_data_source_id> \
 uv run pytest -q tests/live/test_live_content_consistency_e2e.py
+```
+
+MCP HTTP server 真实回归：
+
+```bash
+NOTION_MCP_LIVE_SERVER_E2E=1 \
+NOTION_MCP_LIVE_PARENT_PAGE_ID=<test_page_id> \
+NOTION_MCP_LIVE_DATA_SOURCE_ID=<test_data_source_id> \
+uv run pytest -q tests/live/test_live_mcp_server_http_e2e.py
 ```
 
 ## 安全要求

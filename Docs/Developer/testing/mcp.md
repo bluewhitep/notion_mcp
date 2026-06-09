@@ -30,3 +30,4 @@ env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_mcp_instal
 - MCP Tool 和 CLI 共享 Core，不共享命令字符串。
 - Raw API tool 是高级兜底入口，不应成为普通 page/database workflow 的默认路径。
 - 真实 Notion live 验证必须显式配置 token 和安全测试资源。
+- MCP HTTP server 的真实 Notion 回归位于 `tests/live/test_live_mcp_server_http_e2e.py`，用于验证 server JSON-RPC tool call 通路，不代表 CLI 命令通路。
