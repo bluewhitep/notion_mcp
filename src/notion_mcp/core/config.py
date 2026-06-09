@@ -158,13 +158,13 @@ def save_core_config(config: CoreConfig, path: Path | None = None) -> None:
 # Inputs/Outputs:
 # Input token/user metadata and optional path; returns saved CoreConfig.
 # Usage:
-# init_core_config(notion_token="secret", user_name="Ada", user_id=user_uuid)
+# init_core_config(notion_token="secret", user_name="Ada")
 # --------------------------------
 def init_core_config(
     *,
     notion_token: str,
     user_name: str,
-    user_id: str,
+    user_id: str | None = None,
     notion_version: str = DEFAULT_NOTION_VERSION,
     timeout_ms: int = 60000,
     retry: bool = True,

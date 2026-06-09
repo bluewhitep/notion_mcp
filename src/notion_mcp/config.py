@@ -1,11 +1,9 @@
 """
-配置管理模块。
+Configuration management module.
 
-提供读写全局配置文件的函数，包括设置/获取 Notion 集成 token 和当前用户 UUID。配置文件默认保存在
-用户主目录下的 ``~/.notion_mcp/config.json``，并可通过环境变量 ``NOTION_MCP_CONFIG`` 覆盖。
-
-在实现时我们使用 Pydantic 模型来序列化/反序列化配置，并确保配置字段完整。若配置文件不存在，
-调用 ``load_config`` 时会抛出 ``FileNotFoundError``。设置函数会在不存在配置时创建新配置。
+Provides functions for reading and writing the global configuration file,
+including Notion integration token and user UUID fields. The default file is
+``~/.notion_mcp/config.json`` and can be overridden with ``NOTION_MCP_CONFIG``.
 """
 
 from __future__ import annotations
@@ -17,15 +15,15 @@ from typing import Optional
 from .models import Config
 
 
-# 默认配置目录与文件名
+# Default configuration directory and file name.
 DEFAULT_CONFIG_DIR = Path.home() / ".notion_mcp"
 DEFAULT_CONFIG_FILE = DEFAULT_CONFIG_DIR / "config.json"
 
 
 def get_config_path() -> Path:
-    """返回配置文件的路径。
+    """Return the configuration file path.
 
-    如果设置了环境变量 ``NOTION_MCP_CONFIG``，则使用其值作为配置文件路径；否则使用默认路径。
+    Uses ``NOTION_MCP_CONFIG`` when set; otherwise uses the default path.
     """
     from os import getenv
 
@@ -36,34 +34,34 @@ def get_config_path() -> Path:
 
 
 def load_config(path: Optional[Path] = None) -> Config:
-    """读取配置文件并返回 ``Config`` 实例。
+    """Load the configuration file and return a ``Config`` instance.
 
     Args:
-        path: 配置文件路径，默认为 ``get_config_path()``。
+        path: Configuration file path, defaulting to ``get_config_path()``.
 
     Returns:
-        ``Config``: 解析后的配置对象。
+        ``Config``: Parsed configuration object.
 
     Raises:
-        FileNotFoundError: 当配置文件不存在时抛出。
-        json.JSONDecodeError: 当配置文件不是有效 JSON 时抛出。
+        FileNotFoundError: Raised when the configuration file does not exist.
+        json.JSONDecodeError: Raised when the configuration file is not valid JSON.
     """
     cfg_path = path or get_config_path()
     if not cfg_path.exists():
-        raise FileNotFoundError(f"配置文件不存在: {cfg_path}")
+        raise FileNotFoundError(f"Configuration file does not exist: {cfg_path}")
     with cfg_path.open("r", encoding="utf-8") as f:
         data = json.load(f)
     return Config.model_validate(data)
 
 
 def save_config(config: Config, path: Optional[Path] = None) -> None:
-    """将 ``Config`` 对象序列化到指定路径。
+    """Serialize a ``Config`` object to the target path.
 
-    如果父目录不存在则自动创建。
+    Creates the parent directory when needed.
 
     Args:
-        config: 要保存的配置对象。
-        path: 保存路径，默认为 ``get_config_path()``。
+        config: Configuration object to save.
+        path: Destination path, defaulting to ``get_config_path()``.
     """
     cfg_path = path or get_config_path()
     cfg_path.parent.mkdir(parents=True, exist_ok=True)
@@ -73,9 +71,9 @@ def save_config(config: Config, path: Optional[Path] = None) -> None:
 
 
 def set_token(token: str, path: Optional[Path] = None) -> None:
-    """更新配置中的 Notion token。
+    """Update the Notion token in configuration.
 
-    如果配置文件不存在，则新建配置对象。写入完成后保存到磁盘。
+    Creates a new configuration object when the file does not exist.
     """
     try:
         cfg = load_config(path)
@@ -86,9 +84,9 @@ def set_token(token: str, path: Optional[Path] = None) -> None:
 
 
 def set_user(user_id: str, path: Optional[Path] = None) -> None:
-    """更新配置中的当前用户 UUID。
+    """Update the current user UUID in configuration.
 
-    如果配置文件不存在，则新建配置对象。写入完成后保存到磁盘。
+    Creates a new configuration object when the file does not exist.
     """
     try:
         cfg = load_config(path)

@@ -67,9 +67,29 @@ class ViewsService(BaseNotionService):
     # ViewsService(client).query("view-id", {"page_size": 10})
     # --------------------------------
     def query(self, view_id: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+        query = getattr(self.client.views, "query", None)
+        if callable(query):
+            return self._call(
+                "views.query",
+                query,
+                view_id=view_id,
+                **(payload or {}),
+            )
+
+        queries = getattr(self.client.views, "queries", None)
+        create_query = getattr(queries, "create", None)
+        if callable(create_query):
+            return self._call(
+                "views.query",
+                create_query,
+                view_id=view_id,
+                **(payload or {}),
+            )
+
         return self._call(
             "views.query",
-            self.client.views.query,
-            view_id=view_id,
-            **(payload or {}),
+            self.client.request,
+            path=f"views/{view_id}/queries",
+            method="POST",
+            body=payload or {},
         )

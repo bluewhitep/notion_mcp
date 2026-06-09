@@ -7,13 +7,13 @@
 - legacy tests
   - 保留旧 FastAPI REST 和旧 CLI 行为。
   - 不为了新实现修改旧测试。
-- v2 core tests
+- Core tests
   - 覆盖配置、错误、client factory、auth、services、raw API、审计。
-- v2 CLI tests
+- CLI tests
   - 覆盖 init、config、status、resource command、dry-run。
-- v2 MCP tests
+- MCP tests
   - 覆盖 server lifecycle、tool inventory、tool calls、dangerous tools。
-- v2 scenario tests
+- Scenario tests
   - 覆盖本地配置流程、CLI 到 Core 到 fake Notion、MCP 到 Core 到 fake Notion、隔离安装。
 - live tests
   - 默认跳过。

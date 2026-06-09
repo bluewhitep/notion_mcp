@@ -10,22 +10,19 @@ from notion_mcp.config import load_config
 runner = CliRunner()
 
 
-def test_init_creates_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_config_global_set_creates_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     cfg_file = tmp_path / "config.json"
     monkeypatch.setenv("NOTION_MCP_CONFIG", str(cfg_file))
-    result = runner.invoke(cli_app, ["init", "--token", "abc", "--user", "uid"])
+    result = runner.invoke(cli_app, ["config", "global", "set", "notion_token", "abc"])
     assert result.exit_code == 0
     cfg = load_config(path=cfg_file)
     assert cfg.notion_token == "abc"
-    assert cfg.user_id == "uid"
 
 
 def test_set_token_and_user_commands(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     cfg_file = tmp_path / "config.json"
     monkeypatch.setenv("NOTION_MCP_CONFIG", str(cfg_file))
 
-    # 初始化配置使文件存在
-    runner.invoke(cli_app, ["init", "--token", "abc", "--user", "uid"])
     # 修改 token
     result_token = runner.invoke(cli_app, ["set-token", "--token", "newtoken"])
     assert result_token.exit_code == 0

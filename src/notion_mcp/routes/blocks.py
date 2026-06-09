@@ -1,7 +1,7 @@
 """
-区块相关路由。
+Block-related routes.
 
-提供列出区块子元素、更新区块和追加子区块等功能。
+Provides operations for listing, updating, and appending block children.
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ async def list_block_children(
     block_id: str,
     client: NotionClient = Depends(get_notion_client),
 ) -> Dict[str, Any]:
-    """列出区块的子元素。"""
+    """List child blocks for a block."""
     try:
         result = client.blocks.children.list(block_id=block_id)  # type: ignore[attr-defined]
         return cast(Dict[str, Any], result)
@@ -43,7 +43,7 @@ async def append_block_children(
     body: Dict[str, Any] = Body(...),
     client: NotionClient = Depends(get_notion_client),
 ) -> Dict[str, Any]:
-    """在区块末尾追加子元素。``body`` 应包含 ``children`` 字段。"""
+    """Append child blocks to a block. ``body`` should include ``children``."""
     try:
         result = client.blocks.children.append(block_id=block_id, **body)  # type: ignore[attr-defined]
         return cast(Dict[str, Any], result)
@@ -57,7 +57,7 @@ async def update_block(
     body: Dict[str, Any] = Body(...),
     client: NotionClient = Depends(get_notion_client),
 ) -> Dict[str, Any]:
-    """更新区块内容。根据区块类型传入相应字段。"""
+    """Update block content with fields matching the block type."""
     try:
         result = client.blocks.update(block_id=block_id, **body)  # type: ignore[attr-defined]
         return cast(Dict[str, Any], result)

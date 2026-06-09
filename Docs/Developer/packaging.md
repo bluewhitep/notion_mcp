@@ -57,7 +57,7 @@ hatchling.build
 
 ```bash
 uv run --no-project --with . notion-mcp --help
-uv run --no-project --with . notion-mcp status --json
+uv run --no-project --with . notion-mcp config --global --show --json
 uv run --no-project --with . notion-mcp mcp serve --help
 ```
 

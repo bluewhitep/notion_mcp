@@ -2,6 +2,135 @@
 
 本文档记录 `Docs/dev/Feature_Completion_Plan.md` 的阶段推进情况。每次阶段推进必须记录测试、实现、验证、文档同步和未解决风险。
 
+## 2026-06-09 User CLI 文档拆分
+
+目标：
+
+- 将 `Docs/User/Cli.md` 从混合命令手册调整为 CLI 文档索引。
+- 将 page、block、database/data-source、项目配置、auth/user、comment、view、file upload、search/custom emoji、raw-api、MCP server 和 legacy 命令拆到独立分册。
+- 保证 `Docs/User` 下 Markdown 文件名都以大写字母开头。
+
+实现内容：
+
+- 新增 `Docs/User/Cli/` 分册目录：
+  - `Overview.md`
+  - `Project_Config.md`
+  - `Page.md`
+  - `Block.md`
+  - `Database_DataSource.md`
+  - `Auth_And_User.md`
+  - `Comments.md`
+  - `Views.md`
+  - `File_Uploads.md`
+  - `Search_And_Custom_Emoji.md`
+  - `Raw_API.md`
+  - `MCP_Server.md`
+  - `Legacy_Commands.md`
+- 将 `Docs/User/Cli.md` 改为入口索引。
+- 将 `Docs/User` 顶层文档文件名调整为首字母大写：
+  - `Configuration.md`
+  - `Installation.md`
+  - `MCP_Clients.md`
+  - `Troubleshooting.md`
+- 更新 README、User 指南和 Developer 测试文档中的 User 文档路径。
+
+测试同步：
+
+- CLI 文档清单测试改为读取 `Docs/User/Cli.md` 和 `Docs/User/Cli/*.md`。
+- User 文档边界测试改为递归检查 `Docs/User`。
+- 新增 User 文档文件名大写约束测试。
+
+验证结果：
+
+- `UV_CACHE_DIR=/tmp/uvcache uv run pytest tests/v2/scenarios/test_cli_documentation_inventory.py tests/v2/scenarios/test_documentation_reader_boundary.py tests/v2/scenarios/test_stage1_documentation_alignment.py tests/v2/scenarios/test_stage7_documentation_completeness.py tests/v2/cli/test_raw_api_positioning.py`
+  - 结果：`17 passed`
+- `PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/tmp/uvcache UV_PROJECT_ENVIRONMENT=/tmp/notion_mcp_full_doc_split_env uv run pytest -q -p no:cacheprovider`
+  - 结果：`197 passed, 1 skipped, 1 warning`
+
+## 2026-06-09 CLI 命令面修订
+
+目标：
+
+- 移除公开命令面中的 `project`、`local`、root `status`、`current`、`deattach`、`page content`、`page block *` 和 `page insert *`。
+- 将全局配置改为 `notion-mcp config --global ...`，项目配置查看改为 `notion-mcp config --local --show`。
+- 新增 `notion-mcp pwd` 和 `notion-mcp version`。
+- 将 page 读取拆分为 `page retrieve` 和 `page blocks`。
+- 将 block 编辑统一移动到顶层 `block append/insert-after/update/trash`。
+- 保持 database/data-source 语义分离：显式 data source 操作用 `data-source`，绑定 database 的 active data source 才使用 `database` 快捷命令。
+
+新增测试：
+
+- `tests/v3/cli/test_public_command_surface_revision.py`
+  - 原因：冻结新的公开命令面，防止旧别名重新出现在 help 和用户文档中。
+
+实现内容：
+
+- 新增 root `version` 命令。
+- 新增 root `pwd` 命令，并将 `project` / `local` 命名空间隐藏为兼容入口。
+- 将 root `status` 隐藏为兼容入口；全局状态改由 `config --global --show` 承担。
+- 更新 `config` 命令，支持：
+  - `notion-mcp config --global --show`
+  - `notion-mcp config --local --show`
+  - `notion-mcp config --global user.token <token>`
+  - `notion-mcp config --global user.name <name>`
+- 新增 `page blocks`；`page retrieve` 支持省略 page id 使用 attached page。
+- 将 `page current`、`page deattach`、`page content`、`page block *`、`page insert *` 隐藏为兼容入口。
+- 新增顶层 `block insert-after`、`block update`、`block trash`。
+- 更新 database 快捷命令，隐藏 `database current`、`database deattach` 和 `database query --data-source`，并让公开 `database page create` 只作用于 attached active data source。
+- 新增 `data-source page create <data_source_id>`。
+
+文档同步：
+
+- 新增 `Docs/dev/ADR-004-cli-command-surface-consolidation.md`。
+- 更新 `Docs/User/Cli.md`、`Docs/User/Configuration.md`、`Docs/User/Installation.md`、`Docs/User/Guide.md`、`Docs/User/Troubleshooting.md`、`Docs/User/MCP_Clients.md`。
+- 更新 `Docs/Developer/api/cli.md`、`Docs/Developer/testing/cli.md`。
+- 更新 `Docs/dev/V2_V3_Development_Design.md` 和 `Docs/dev/V2_V3_Trackable_Tasks.md`。
+
+验证结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_command_surface_post2 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_command_surface_post2_env uv run pytest -q -p no:cacheprovider tests/v3/cli/test_public_command_surface_revision.py`
+  - 结果：`7 passed`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_cli UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_cli_env uv run pytest -q -p no:cacheprovider tests/v3/cli`
+  - 结果：`43 passed`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v2_cli3 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v2_cli3_env uv run pytest -q -p no:cacheprovider tests/v2/cli tests/v2/scenarios`
+  - 结果：`64 passed, 1 warning`
+
+注意事项：
+
+- Hidden compatibility aliases remain for old scripts, but public docs and help must not present them as official commands.
+- Real Notion workspace validation is still integration-only and must be enabled explicitly with a safe test workspace.
+
+## 2026-06-09 Page URL 输入解析
+
+目标：
+
+- 允许公开 `<page_id>` 输入直接传 Notion page id、Notion 分享 URL 或包含 Notion URL 的 Markdown 链接。
+- URL 中的 32 位 Notion id 解析后统一规范为带连字符的 UUID。
+
+实现内容：
+
+- 新增 `src/notion_mcp/core/identifiers.py`，集中解析 Notion-style UUID。
+- CLI page 命令支持 URL 输入：
+  - `page attach <page_id_or_url>`
+  - `page retrieve <page_id_or_url>`
+  - `page blocks <page_id_or_url>`
+  - `page create --parent-page <page_id_or_url>`
+  - `page update <page_id_or_url>`
+  - `page trash <page_id_or_url>`
+- `database create --parent-page <page_id_or_url>` 支持 URL 输入。
+- Core `ContextResolver.resolve_page_id()` 和 `PagesService` 的 page id 方法也支持 URL 输入，便于 MCP tools 复用。
+
+新增测试：
+
+- `tests/v3/core/test_identifier_parsing.py`
+- `tests/v3/cli/test_page_url_inputs.py`
+- 更新 `tests/v3/core/test_page_content_service.py`
+
+验证结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_page_url_post3 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_page_url_post3_env uv run pytest -q -p no:cacheprovider tests/v3/core/test_identifier_parsing.py tests/v3/core/test_page_content_service.py tests/v3/cli/test_page_url_inputs.py tests/v3/cli/test_page_attach.py tests/v3/cli/test_page_content_attach.py tests/v3/cli/test_page_insert.py tests/v3/cli/test_database_context_resolution.py tests/v3/cli/test_page_context_resolution.py`
+  - 结果：`24 passed`
+
 ## 2026-06-07 阶段 0 启动
 
 目标：
@@ -82,7 +211,7 @@
 - 更新 `Docs/TechStack.md`，加入 `uv`、MCP Python SDK、Notion API version 策略和 legacy FastAPI 定位。
 - 更新 `Docs/Development_Plan.md`，将旧计划标记为 `legacy prototype`，并把当前执行入口指向 `Docs/dev/Feature_Completion_Plan.md`。
 - 新增 `Docs/Developer/mcp_tools/README.md`，作为开发者 MCP tool contract 文档入口。
-- 新增 `Docs/User/mcp_clients.md`，作为使用者配置 MCP client 的文档入口。
+- 新增 `Docs/User/MCP_Clients.md`，作为使用者配置 MCP client 的文档入口。
 
 验证结果：
 
@@ -229,7 +358,7 @@
 - 更新 `Docs/Developer/API.md`，加入 CLI API 和 CLI 测试入口。
 - 新增 `Docs/Developer/api/cli.md`。
 - 新增 `Docs/Developer/testing/cli.md`。
-- 新增 `Docs/User/cli.md`。
+- 新增 `Docs/User/Cli.md`。
 - 更新 `Docs/User/Guide.md`，说明当前可用入口包括新版 git-like CLI 和 legacy FastAPI REST 原型，MCP Tool 仍待 Stage 4。
 
 验证结果：
@@ -339,8 +468,8 @@ SDK 验证：
   - `Docs/Developer/mcp_tools/raw_api.md`
 - 新增 `Docs/Developer/testing/mcp.md`。
 - 更新 `Docs/Developer/API.md`。
-- 更新 `Docs/User/mcp_clients.md`。
-- 更新 `Docs/User/cli.md`。
+- 更新 `Docs/User/MCP_Clients.md`。
+- 更新 `Docs/User/Cli.md`。
 - 更新 `Docs/User/Guide.md`。
 
 验证结果：
@@ -514,9 +643,9 @@ SDK 验证：
 - 新增 `Docs/Developer/architecture/overview.md`。
 - 新增 `Docs/Developer/testing/strategy.md`。
 - 新增 `Docs/Developer/packaging.md`。
-- 新增 `Docs/User/installation.md`。
-- 新增 `Docs/User/configuration.md`。
-- 新增 `Docs/User/troubleshooting.md`。
+- 新增 `Docs/User/Installation.md`。
+- 新增 `Docs/User/Configuration.md`。
+- 新增 `Docs/User/Troubleshooting.md`。
 
 中间修复：
 
@@ -535,7 +664,7 @@ SDK 验证：
 注意事项：
 
 - 文档已按开发者和使用者拆分。
-- `Docs/User/installation.md` 已提供从零安装和运行入口。
+- `Docs/User/Installation.md` 已提供从零安装和运行入口。
 
 ## 2026-06-08 阶段 8 启动
 
@@ -608,7 +737,7 @@ SDK 验证：
 文档同步：
 
 - 更新 `Docs/Developer/packaging.md`，记录 hatchling 构建后端、发布检查命令、ruff/mypy cache 策略和生成物清单。
-- 更新 `Docs/Developer/api/cli.md`、`Docs/User/cli.md`、`Docs/Developer/testing/cli.md`，记录扩展 CLI resource commands。
+- 更新 `Docs/Developer/api/cli.md`、`Docs/User/Cli.md`、`Docs/Developer/testing/cli.md`，记录扩展 CLI resource commands。
 - 更新 `Docs/TechStack.md`，记录 Python 3.10 下限、dev dependency group 和质量工具状态。
 - 更新 `Docs/User/Guide.md`，将安装前提同步为 Python 3.10+。
 - 更新 `Docs/dev/progress.md`，记录阶段 8 测试、实现、验证结果和未执行 live 测试原因。
@@ -670,3 +799,1253 @@ SDK 验证：
   - `find . -type f -size +250k`
   - 结果：仅 `./uv.lock`。
   - 说明：`uv.lock` 是 `uv` 项目依赖锁文件，约 367KB；没有发现缓存或构建产物大文件。
+
+## 2026-06-08 CLI 文档清单补全
+
+目标：
+
+- 补全 `Docs/User/Cli.md`，写出当前所有可操作 CLI 指令。
+- 明确哪些能力有专用 CLI 子命令，哪些能力当前需要通过 `raw-api invoke` 操作。
+- 补全 MCP client 和 MCP tools 文档中的具体 tool 清单。
+
+新增测试：
+
+- `tests/v2/scenarios/test_cli_documentation_inventory.py`
+  - 原因：用户 CLI 文档此前只列常用示例，没有覆盖 `auth`、page update/trash、扩展资源生命周期命令、legacy 兼容命令和 raw-api 覆盖操作。
+
+首次验证：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_docs_inventory UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_docs_inventory_env uv run pytest -q -p no:cacheprovider tests/v2/scenarios/test_cli_documentation_inventory.py`
+  - 结果：`2 failed`
+  - 原因：`Docs/User/Cli.md` 缺少 `notion-mcp auth validate` 等专用命令，并缺少 `blocks.update`、`blocks.delete`、`databases.create`、`databases.update` raw-api 覆盖说明。
+
+文档更新：
+
+- 更新 `Docs/User/Cli.md`：
+  - 改为完整 CLI 命令参考。
+  - 补齐 init、status、config、auth、pages、blocks、databases、data sources、users、comments、views、file uploads、search、custom emojis、raw-api、MCP serve、legacy 兼容命令。
+  - 明确当前 CLI 没有区块 update/trash 和 database create/update 专用子命令；这些能力可通过受控 Raw API 操作。
+- 更新 `Docs/Developer/api/cli.md`：
+  - 补齐专用 CLI 命令清单和 raw-api operation 清单。
+  - 记录 block/database 的专用 CLI 缺口和 raw-api 覆盖路径。
+- 更新 `Docs/User/MCP_Clients.md`：
+  - 补齐 42 个 MCP tool 名称。
+- 更新 `Docs/Developer/mcp_tools/README.md`：
+  - 补齐 MCP tool inventory。
+- 更新 `Docs/Developer/testing/cli.md`：
+  - 记录 CLI 文档清单测试和验证命令。
+
+验证结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_docs_inventory UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_docs_inventory_env uv run pytest -q -p no:cacheprovider tests/v2/scenarios/test_cli_documentation_inventory.py tests/v2/scenarios/test_stage7_documentation_completeness.py tests/v2/scenarios/test_stage8_release_readiness.py`
+  - 结果：`8 passed`
+  - 说明：文档清单、使用者文档边界和发布卫生检查通过。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_docs_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_docs_full_env uv run pytest -q -p no:cacheprovider`
+  - 结果：`96 passed, 1 skipped, 1 warning`
+  - 说明：新增文档清单测试已纳入全量测试；skip 为默认跳过的 live Notion 测试。
+
+注意事项：
+
+- 本次只补文档和文档清单测试，没有新增 CLI 实现。
+- 当前 CLI 专用命令仍没有 `block update/trash` 和 `database create/update`；这些操作通过 `notion-mcp raw-api invoke blocks.update`、`blocks.delete`、`databases.create`、`databases.update` 记录为可操作路径。
+
+## 2026-06-08 ADR-002 v2 设计决议固化
+
+目标：
+
+- 固化 Git-like 本地目录上下文设计。
+- 固化 `database` 和 `data_source` 严格分离的语义边界。
+- 固化 Page CLI、Block CLI、Database CLI、DataSource CLI 和 Raw API 的用户分层。
+- 明确 ADR-002 是 Accepted / 待实施，不表示当前 CLI 已具备全部计划命令。
+
+文档更新：
+
+- 新增 `Docs/dev/ADR-002-local-context-and-cli-v2.md`：
+  - 记录全局配置与本地 `.notion-mcp/config.json` 分离。
+  - 记录本地配置不保存 token。
+  - 记录 database/data_source 语义边界和 Core 服务划分。
+  - 补充 Notion 官方 Database、Data source 和 Versioning 文档链接作为设计语义依据。
+  - 记录 page content、page block、database sources、data-source property 等 v2 计划命令。
+  - 记录 `insert-before` 不作为 v2 首批稳定能力。
+  - 记录 Notion-Version 默认 pinned 且集中配置。
+  - 记录 v2.0 到 v2.5 实施阶段和最小闭环。
+- 更新 `Docs/dev/User_Usage_Model_Revision.md`：
+  - 改为指向 ADR-002，避免重复维护。
+- 更新 `Docs/Requirements.md`：
+  - 新增 v2 设计决议摘要。
+- 更新 `Docs/User/Configuration.md`：
+  - 新增 v2 待实施本地目录上下文配置说明。
+- 更新 `Docs/User/Cli.md`：
+  - 新增 v2 待实施人类友好 CLI 计划说明。
+- 更新 `Docs/Developer/api/cli.md`：
+  - 新增 ADR-002 CLI 设计边界。
+- 更新 `Docs/Developer/mcp_tools/databases.md` 和 `Docs/Developer/mcp_tools/data_sources.md`：
+  - 记录 database 是容器、data_source 是表级对象。
+- 更新 `Docs/Developer/testing/cli.md`：
+  - 新增 ADR-002 待新增测试清单。
+- 更新 `Docs/dev/Feature_Completion_Plan.md`：
+  - 记录 ADR-002 是后续 v2 产品层补充。
+
+验证结果：
+
+- 本次为文档/ADR 固化，未新增 CLI 实现。
+- 未运行 pytest；当前新增内容是待实施设计说明，不改变源码行为。
+- 未执行 live Notion 测试；原因是没有实现变更，也没有真实 Notion token、测试 workspace 和安全写入目标。
+
+## 2026-06-08 ADR-003 项目 attach runtime 工作流加入后续任务
+
+目标：
+
+- 将 `.notion_mcp` 项目级配置与 page/database attach 工作流加入后续开发任务。
+- 明确 ADR-003 覆盖 ADR-002 中 `.notion-mcp` 目录命名的早期设计。
+- 将后续实现拆分为 project 配置、page attach、database attach、场景测试和文档收敛阶段。
+
+文档更新：
+
+- 新增 `Docs/dev/ADR-003-project-attach-context.md`：
+  - 记录状态为 `Design Accepted / 待实现`。
+  - 记录项目级目录名 `.notion_mcp`、配置文件 `.notion_mcp/config.json`、状态目录 `.notion_mcp/state/`。
+  - 记录 `page.attach.json` 和 `database.attach.json` 状态文件结构。
+  - 记录 token 不允许写入项目目录。
+  - 记录 cwd 向上发现项目配置规则。
+  - 记录 `project init/status/root`、`page attach/status/refresh/detach/deattach`、`database attach/status/refresh/detach/deattach` 计划命令。
+  - 记录 page/database 操作默认对象解析规则：显式 id > attachment > error。
+  - 记录 `tests/v3/core/`、`tests/v3/cli/`、`tests/v3/scenarios/` 后续测试目录。
+- 更新 `Docs/dev/ADR-002-local-context-and-cli-v2.md`：
+  - 增加后续 ADR 覆盖说明，明确 `.notion_mcp` 以 ADR-003 为准。
+- 更新 `Docs/Requirements.md`：
+  - 将后续目标挂接到 ADR-003，并改用 `.notion_mcp/config.json`。
+- 更新 `Docs/User/Configuration.md`：
+  - 增加项目配置和 attach state 说明。
+- 更新 `Docs/User/Cli.md`：
+  - 增加 project/page attach/database attach 待实施命令摘要。
+- 更新 `Docs/Developer/api/cli.md`：
+  - 增加 ProjectResolver、AttachmentStore、ContextResolver 相关后续设计。
+- 更新 `Docs/Developer/testing/cli.md`：
+  - 增加 v3 attach workflow 测试清单。
+- 更新 `Docs/dev/Feature_Completion_Plan.md`：
+  - 将 ADR-003 纳入后续开发计划。
+
+验证结果：
+
+- 本次只新增和同步设计文档，未新增 CLI 实现。
+- 未运行 pytest；当前新增内容不改变源码行为。
+- 未执行 live Notion 测试；原因是没有实现变更，也没有真实 Notion token、测试 workspace 和安全写入目标。
+
+## 2026-06-08 V2/V3 开发设计和任务追踪清单
+
+目标：
+
+- 将 ADR-002 和 ADR-003 从设计决议转换为实施导向的开发设计。
+- 建立可追踪任务列表，覆盖项目配置、attach state、Page CLI、Database/DataSource、MCP 工具、Raw API、版本策略、测试和文档同步。
+- 明确每个任务的任务 ID、依赖、输出文件、测试目标和验收标准。
+
+文档更新：
+
+- 新增 `Docs/dev/V2_V3_Development_Design.md`：
+  - 记录目标调用关系：CLI/MCP Tool 共享 Core。
+  - 记录全局配置与项目级 `.notion_mcp` 配置边界。
+  - 记录 ProjectResolver、ProjectConfigStore、AttachmentStore、ContextResolver 等开发模块职责。
+  - 记录 page/database attach、Page content、Page block、Database/DataSource CLI、MCP tools 和 Raw API 的实现边界。
+  - 记录 v2/v3 测试目录和最小交付闭环。
+- 新增 `Docs/dev/V2_V3_Trackable_Tasks.md`：
+  - 拆分 D0 到 P15 阶段任务。
+  - 任务覆盖 tests-first、Core、CLI、MCP、文档同步和最终验收。
+  - 将 `insert-before`、cache/index、logs/audit、OAuth 和 GUI 标记为 deferred。
+- 更新 `Docs/dev/Feature_Completion_Plan.md`：
+  - 增加 V2/V3 开发设计和任务列表入口。
+
+验证结果：
+
+- 本次为文档规划更新，没有修改源码。
+- 未运行 pytest；当前新增内容不改变代码行为。
+
+## 2026-06-08 V2/V3 P1/P2 项目配置实现
+
+完成任务：
+
+- `V2V3-P1-001`：新增 project root discovery Core 测试。
+- `V2V3-P1-002`：新增 `project init` CLI 测试。
+- `V2V3-P1-003`：新增 `project status/root` CLI 测试。
+- `V2V3-P2-001`：实现 `.notion_mcp` project path helpers。
+- `V2V3-P2-002`：实现 `ProjectResolver`。
+- `V2V3-P2-003`：实现 `ProjectConfigStore`。
+- `V2V3-P2-004`：实现项目配置原子 JSON 写入。
+- `V2V3-P2-005`：实现 `notion-mcp project init/status/root`。
+- `V2V3-P2-006`：实现 `notion-mcp local init/status/root` 兼容别名。
+
+源码更新：
+
+- `src/notion_mcp/core/errors.py`
+  - 新增 project config missing/already initialized/validation error 类型。
+- `src/notion_mcp/core/project/`
+  - 新增 `project_paths.py`、`project_config.py`、`project_resolver.py` 和 package export。
+- `src/notion_mcp/cli/commands/project.py`
+  - 新增 project/local 命令组。
+- `src/notion_mcp/cli/app.py`
+  - 注册 project/local 命令组。
+
+测试更新：
+
+- `tests/v3/core/test_project_resolver.py`
+- `tests/v3/cli/test_project_init.py`
+- `tests/v3/cli/test_project_status.py`
+
+文档更新：
+
+- `Docs/dev/V2_V3_Trackable_Tasks.md`
+  - 将 P1/P2 任务标记为完成。
+- `Docs/User/Configuration.md`
+  - 记录 project/local 命令已实现，page/database attach 仍待实施。
+- `Docs/User/Cli.md`
+  - 新增项目上下文命令说明。
+- `Docs/Developer/api/cli.md`
+  - 记录 project/local 命令和 Core project 模块。
+- `Docs/Developer/testing/cli.md`
+  - 记录已新增 v3 project tests。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_project_tests UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_project_env uv run pytest -q -p no:cacheprovider tests/v3/core/test_project_resolver.py tests/v3/cli/test_project_init.py tests/v3/cli/test_project_status.py`
+  - 结果：`12 passed`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_project_tests UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_project_env uv run pytest -q -p no:cacheprovider tests/v2/cli tests/v3`
+  - 结果：`35 passed`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_project_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_project_full_env uv run pytest -q -p no:cacheprovider`
+  - 首次结果：`1 failed, 107 passed, 1 skipped, 1 warning`
+  - 失败原因：仓库根目录存在生成物 `__pycache__`，触发 release readiness 测试。
+  - 处理：删除 `__pycache__` 生成物。
+  - 重跑结果：`108 passed, 1 skipped, 1 warning`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_project_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_project_full_env uv run ruff check .`
+  - 结果：`All checks passed!`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_project_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_project_full_env uv run mypy src`
+  - 结果：`Success: no issues found in 74 source files`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_project_help uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp --help`
+  - 结果：通过，help 中包含 `project` 和 `local` 命令组。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_project_help uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp project --help`
+  - 结果：通过，包含 `init`、`status`、`root`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_project_help uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp local --help`
+  - 结果：通过，包含 `init`、`status`、`root`。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；本阶段只实现本地项目配置，不调用 Notion API。
+
+风险和后续：
+
+- Page/database attach state 尚未实现。
+- attach 后 page/database 命令省略 id 尚未实现。
+- 下一阶段应进入 `V2V3-P3` 和 `V2V3-P4`，先写 Page attachment tests，再实现 PageAttachmentStore 和 page attach/status/refresh/detach。
+
+## 2026-06-08 V2/V3 P3/P4 Page attach 实现
+
+官方文档检查：
+
+- 检查日期：2026-06-08。
+- Notion Retrieve a page: https://developers.notion.com/reference/retrieve-a-page
+  - 结论：`pages.retrieve` 返回 page properties，不返回页面内容；页面内容仍需通过 block children 获取。
+- Notion Page object: https://developers.notion.com/reference/page
+  - 结论：Page object 包含 `parent`、`url`、`in_trash`；`archived` 已废弃，应优先使用 `in_trash`。
+- Notion Trash a page: https://developers.notion.com/reference/trash-page
+  - 结论：trash 使用 update page 的 `in_trash`；本阶段的 `page detach/deattach` 只删除本地 state，不修改 Notion page。
+
+完成任务：
+
+- `V2V3-P3-001`：新增 page attachment store 测试。
+- `V2V3-P3-002`：新增 `page attach` CLI 测试。
+- `V2V3-P3-003`：新增 `page status/current/refresh` CLI 测试。
+- `V2V3-P3-004`：新增 `page detach/deattach` CLI 测试。
+- `V2V3-P3-005`：新增 page id context resolution 测试。
+- `V2V3-P4-001`：实现 `PageAttachment` model。
+- `V2V3-P4-002`：实现 `PageAttachmentStore`。
+- `V2V3-P4-003`：实现 `ContextResolver.resolve_page_id()`。
+- `V2V3-P4-004`：实现 `notion-mcp page attach`。
+- `V2V3-P4-005`：实现 `notion-mcp page status/current/refresh`。
+- `V2V3-P4-006`：实现 `notion-mcp page detach/deattach`。
+
+源码更新：
+
+- `src/notion_mcp/core/errors.py`
+  - 新增 `PageAttachmentNotFoundError`。
+- `src/notion_mcp/core/attachments/`
+  - 新增 `page_attachment.py`、`attachment_store.py`、`context_resolver.py` 和 package export。
+- `src/notion_mcp/cli/commands/pages.py`
+  - 新增 page attach/status/current/refresh/detach/deattach 命令。
+
+测试更新：
+
+- `tests/v3/core/test_page_attachment_store.py`
+- `tests/v3/cli/test_page_attach.py`
+- `tests/v3/cli/test_page_status.py`
+- `tests/v3/cli/test_page_detach.py`
+- `tests/v3/cli/test_page_context_resolution.py`
+
+文档更新：
+
+- `Docs/dev/V2_V3_Trackable_Tasks.md`
+  - 将 P3/P4 任务标记为完成。
+- `Docs/User/Configuration.md`
+  - 记录 page attach/status/current/refresh/detach/deattach 已实现。
+- `Docs/User/Cli.md`
+  - 新增 Page attach 命令说明。
+- `Docs/Developer/api/cli.md`
+  - 记录 Core attachment 模块和 page attach 命令边界。
+- `Docs/Developer/testing/cli.md`
+  - 记录已新增 v3 page attachment tests。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_page_tests UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_page_env uv run pytest -q -p no:cacheprovider tests/v3/core/test_page_attachment_store.py tests/v3/cli/test_page_attach.py tests/v3/cli/test_page_status.py tests/v3/cli/test_page_detach.py tests/v3/cli/test_page_context_resolution.py`
+  - 结果：`14 passed`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_page_tests UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_page_env uv run pytest -q -p no:cacheprovider tests/v2/cli tests/v3`
+  - 结果：`49 passed`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_page_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_page_full_env uv run pytest -q -p no:cacheprovider`
+  - 结果：`122 passed, 1 skipped, 1 warning`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_page_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_page_full_env uv run ruff check .`
+  - 首次结果：1 个未使用 import；已修复。
+  - 重跑结果：`All checks passed!`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_page_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_page_full_env uv run mypy src`
+  - 结果：`Success: no issues found in 78 source files`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_page_help uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp page --help`
+  - 结果：通过，help 中包含 `attach`、`current`、`status`、`refresh`、`detach`、`deattach`。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；本阶段测试使用 fake page service，避免真实 workspace 写入。
+
+风险和后续：
+
+- `page content` 尚未实现，因此最终最小闭环中的 `notion-mcp page content` 仍未完成。
+- attach 后 page/database 命令省略 id 尚未完整接入普通 page/database 操作。
+- 下一阶段应进入 `V2V3-P5` 和 `V2V3-P6`，实现 page content 和 page-scoped block editing。
+
+## 2026-06-08 V2/V3 P5/P6 Page content 和页面内编辑实现
+
+官方文档检查：
+
+- 检查日期：2026-06-08。
+- Notion Retrieve block children: https://developers.notion.com/reference/get-block-children
+  - 结论：page 内容需要通过 block children 获取；需要递归时继续读取有 `has_children` 的 child block。
+- Notion Append block children: https://developers.notion.com/reference/patch-block-children
+  - 结论：`after` 已废弃，`2026-03-11` 应使用 `position`；`insert-after` 使用 `{ "type": "after_block", "after_block": { "id": "<block_id>" } }`。
+- Notion Update a block: https://developers.notion.com/reference/update-a-block
+  - 结论：block children 不能通过 update endpoint 直接更新；children 追加应使用 append block children。
+- Notion Delete a block: https://developers.notion.com/reference/delete-a-block
+  - 结论：delete block 会将 block 设置为 `in_trash: true`，用于 `page block remove`。
+- Notion Create a page: https://developers.notion.com/reference/post-page
+  - 结论：创建 child page 时可使用 page parent；当 payload 未提供 parent 时，CLI 使用 attached page。
+- Notion Create a database: https://developers.notion.com/reference/create-database
+  - 结论：database 是容器，create database 会创建 database 及初始 data source；当 payload 未提供 parent 时，CLI 使用 attached page。
+
+完成任务：
+
+- `V2V3-P5-001`：新增 `page content` 测试。
+- `V2V3-P5-002`：新增 page-scoped block editing 测试。
+- `V2V3-P5-003`：新增 `page insert page/database` 测试。
+- `V2V3-P6-001`：实现 `PagesService.content()`。
+- `V2V3-P6-002`：实现 page content human 和 JSON 输出。
+- `V2V3-P6-003`：实现 `page content` attached defaulting。
+- `V2V3-P6-004`：实现 `page block append/update/insert-after/remove`。
+- `V2V3-P6-005`：实现 `page insert page/database`。
+
+源码更新：
+
+- `src/notion_mcp/core/services/pages.py`
+  - 新增 `content()`、block summary、parent id 和 rich text 摘要 helpers。
+- `src/notion_mcp/cli/commands/pages.py`
+  - 新增 `page content`。
+  - 新增 `page block append/insert-after/update/remove`。
+  - 新增 `page insert page/database`。
+
+测试更新：
+
+- `tests/v3/core/test_page_content_service.py`
+- `tests/v3/cli/test_page_content_attach.py`
+- `tests/v3/cli/test_page_block_edit_attach.py`
+- `tests/v3/cli/test_page_insert.py`
+
+文档更新：
+
+- `Docs/dev/V2_V3_Trackable_Tasks.md`
+  - 将 P5/P6 任务标记为完成。
+- `Docs/User/Cli.md`
+  - 记录 page content、page block 和 page insert 已实现。
+- `Docs/User/Configuration.md`
+  - 记录 page content 和页面内编辑命令已实现。
+- `Docs/Developer/api/cli.md`
+  - 记录 page content、page block 和 page insert 的 CLI 到 Core 边界。
+- `Docs/Developer/testing/cli.md`
+  - 记录已新增 v3 page content/edit tests。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_content_tests UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_content_env uv run pytest -q -p no:cacheprovider tests/v3/core/test_page_content_service.py tests/v3/cli/test_page_content_attach.py tests/v3/cli/test_page_block_edit_attach.py tests/v3/cli/test_page_insert.py`
+  - 结果：`10 passed`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_content_tests UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_content_env uv run pytest -q -p no:cacheprovider tests/v2/cli tests/v3`
+  - 结果：`59 passed`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_content_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_content_full_env uv run pytest -q -p no:cacheprovider`
+  - 结果：`132 passed, 1 skipped, 1 warning`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_content_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_content_full_env uv run ruff check .`
+  - 结果：`All checks passed!`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_content_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_v3_content_full_env uv run mypy src`
+  - 首次结果：`src/notion_mcp/cli/commands/pages.py` 有动态 dict/list 类型问题；已用 `typing.cast` 收紧。
+  - 重跑结果：`Success: no issues found in 78 source files`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_v3_content_help uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp page --help`
+  - 结果：通过，help 中包含 `content`、`block`、`insert`。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；本阶段测试使用 fake page/block/database service，避免真实 workspace 写入。
+
+风险和后续：
+
+- Database/DataSource attach 与 database 默认 active data source 仍未实现。
+- MCP tools 尚未同步新的 attach/page content 行为。
+- 最小闭环中 page 部分已经具备本地 fake 测试覆盖；database attach/query 部分仍待 P7-P10。
+
+## 2026-06-08 V2/V3 P7/P8 Database/DataSource Core 和 CLI 扩展
+
+官方文档检查：
+
+- 检查日期：2026-06-08。
+- Notion Data source object: https://developers.notion.com/reference/data-source
+  - 结论：data sources 是 database 下的具体表，pages 是 data source 中的 items；data source 承载 properties/schema。
+- Notion Retrieve a database: https://developers.notion.com/reference/retrieve-database
+  - 结论：database 是包含一个或多个 data sources 的容器；response 中的 `data_sources` 提供 id/name，并可用于 retrieve/update/query data source。
+- Notion Retrieve a data source: https://developers.notion.com/reference/retrieve-a-data-source
+  - 结论：retrieve data source 返回表级 schema；查询 rows/pages 应使用 Query a data source。
+- Notion Query a data source: https://developers.notion.com/reference/query-a-data-source
+  - 结论：query data source 返回 data source 中的 pages/entries，并支持 filter、sort 和 pagination。
+- Notion Create a data source: https://developers.notion.com/reference/create-a-data-source
+  - 结论：create data source 在现有 database 容器下新增表；parent 使用 database id。
+- Notion Update a data source: https://developers.notion.com/reference/update-a-data-source
+  - 结论：update data source 用于更新 title、description、properties、trash 状态和 parent；不能用于更新 data source rows。
+- Notion Update data source properties: https://developers.notion.com/reference/update-data-source-properties
+  - 结论：重命名 property 应在 `properties` body 中用 property id/name 指向 `{ "name": "<new_name>" }`。
+- Notion List data source templates: https://developers.notion.com/reference/list-data-source-templates
+  - 结论：templates endpoint 是 `GET /v1/data_sources/{data_source_id}/templates`；Python SDK v3.1.0 本地检查显示方法名为 `client.data_sources.list_templates`。
+- Notion Parent object: https://developers.notion.com/reference/parent-object
+  - 结论：data source parent object 使用 `type: "data_source_id"` 和 `data_source_id`，用于 page/entry parent。
+- Notion Create a page: https://developers.notion.com/reference/post-page
+  - 结论：创建 page 可使用 page 或 data source parent；data source 下创建 page 时 properties 必须匹配 parent data source schema。
+- Notion 2026-03-11 Upgrade Guide: https://developers.notion.com/guides/get-started/upgrade-guide-2026-03-11
+  - 结论：继续遵守 `position` 和 `in_trash` 语义；本阶段没有新增 block positioning 能力。
+
+完成任务：
+
+- `V2V3-P7-001`：新增 database/data source service separation 测试。
+- `V2V3-P7-002`：新增 database container CLI 测试。
+- `V2V3-P7-003`：新增显式 `data-source` namespace CLI 测试。
+- `V2V3-P7-004`：部分新增 database shortcut 测试，覆盖显式 `--data-source`、`database page`、`database property`；单/多 data source 自动解析仍待 P9/P10。
+- `V2V3-P8-001`：部分实现 `DatabaseService` 容器能力，新增 `list_data_sources()` 和 `rename()`；legacy `query()` 暂保留以兼容旧测试。
+- `V2V3-P8-002`：实现 `DataSourcesService` 的 `create_for_database()`、`templates()` 和 `rename_property()`。
+- `V2V3-P8-003`：实现 database CLI container commands。
+- `V2V3-P8-004`：实现显式 `data-source` CLI namespace 扩展。
+- `V2V3-P8-005`：部分实现 database shortcut commands；完整 shortcut resolver 等待 database attach context。
+
+源码更新：
+
+- `src/notion_mcp/core/services/databases.py`
+  - 新增 database container `list_data_sources()`、`rename()` 和 rich text title helper。
+- `src/notion_mcp/core/services/data_sources.py`
+  - 新增 `create_for_database()`、`templates()`、`rename_property()`。
+- `src/notion_mcp/cli/commands/databases.py`
+  - 新增 `sources/create/update/rename`。
+  - 新增 `database query --data-source` 显式 data source shortcut。
+  - 新增 `database page create/update`。
+  - 新增 `database property rename`。
+- `src/notion_mcp/cli/commands/data_sources.py`
+  - 新增 `data-source create <database_id>`。
+  - 新增 `data-source templates`。
+  - 新增 `data-source property rename`。
+
+测试更新：
+
+- `tests/v2/core/test_database_data_source_services.py`
+- `tests/v2/cli/test_database_container.py`
+- `tests/v2/cli/test_data_source_namespace.py`
+- `tests/v2/cli/test_database_shortcut_commands.py`
+
+文档更新：
+
+- `Docs/dev/V2_V3_Trackable_Tasks.md`
+  - 将 P7-001/P7-002/P7-003、P8-002/P8-003/P8-004 标记为完成。
+  - 将 P7-004、P8-001、P8-005 标记为进行中，并记录 legacy query 和 attach/defaulting 待完成原因。
+- `Docs/User/Cli.md`
+  - 新增 database/data-source 当前已实现命令说明。
+- `Docs/User/Configuration.md`
+  - 更新当前已实现和仍待实施的 database/defaulting 状态。
+- `Docs/Developer/api/cli.md`
+  - 记录 database/data-source CLI 到 Core 边界。
+- `Docs/Developer/testing/cli.md`
+  - 记录新增 P7/P8 测试文件。
+- `Docs/Developer/mcp_tools/databases.md`
+- `Docs/Developer/mcp_tools/data_sources.md`
+  - 记录 CLI/Core 已扩展但 MCP tools 尚未同步的缺口。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_sdk_inspect uv run python -c '...'`
+  - 结果：通过；本地安装 `notion-client==3.1.0`，`Client` 有 `data_sources`，其中包含 `create`、`retrieve`、`update`、`query`、`list_templates`。
+  - 注意：这条命令未设置 `UV_PROJECT_ENVIRONMENT`，生成了本地 `.venv/`；随后已删除 `.venv/` 并重跑 release readiness。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p7_pre UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p7_pre_env uv run pytest -q -p no:cacheprovider tests/v2/core/test_database_data_source_services.py tests/v2/cli/test_database_container.py tests/v2/cli/test_data_source_namespace.py tests/v2/cli/test_database_shortcut_commands.py`
+  - 首次结果：`10 failed, 1 passed`；失败点是预期的缺失 P7/P8 功能。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p7_post UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p7_post_env uv run pytest -q -p no:cacheprovider tests/v2/core/test_database_data_source_services.py tests/v2/cli/test_database_container.py tests/v2/cli/test_data_source_namespace.py tests/v2/cli/test_database_shortcut_commands.py`
+  - 结果：`11 passed`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p7_wide UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p7_wide_env uv run pytest -q -p no:cacheprovider tests/v2/core tests/v2/cli tests/v3`
+  - 结果：`96 passed`
+
+未运行：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p7_docs UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p7_docs_env uv run pytest -q -p no:cacheprovider tests/v2/scenarios/test_cli_documentation_inventory.py tests/v2/scenarios/test_stage7_documentation_completeness.py tests/v2/scenarios/test_stage8_release_readiness.py`
+  - 首次结果：`1 failed, 7 passed`；失败原因是本轮 SDK 检查误生成仓库根 `.venv/`，release readiness 扫描到 `.venv` 中的大文件。
+- `rm -rf .venv`
+  - 结果：通过；删除本轮误生成的仓库根临时环境。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p7_docs2 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p7_docs2_env uv run pytest -q -p no:cacheprovider tests/v2/scenarios/test_cli_documentation_inventory.py tests/v2/scenarios/test_stage7_documentation_completeness.py tests/v2/scenarios/test_stage8_release_readiness.py`
+  - 结果：`8 passed`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p7_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p7_full_env uv run pytest -q -p no:cacheprovider`
+  - 结果：`143 passed, 1 skipped, 1 warning`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p7_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p7_full_env uv run ruff check .`
+  - 结果：`All checks passed!`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p7_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p7_full_env uv run mypy src`
+  - 结果：`Success: no issues found in 78 source files`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p7_help1 uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp --help`
+  - 结果：通过；root help 显示 `database` 和 `data-source` 命令组。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p7_help2 uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp database --help`
+  - 结果：通过；help 显示 `retrieve/sources/create/update/rename/query/page/property`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p7_help3 uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp data-source --help`
+  - 结果：通过；help 显示 `retrieve/query/create/update/templates/property`。
+- `find . -name __pycache__ -type d -print`
+  - 结果：无输出。
+- `test -d .venv && printf '.venv exists\n' || true`
+  - 结果：无输出。
+- `git diff --check`
+  - 结果：无输出。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；本阶段使用 fake services 和 fake SDK-compatible clients，避免真实 workspace 写入。
+
+风险和后续：
+
+- `database query <database_id>` legacy 兼容入口仍保留，以避免破坏旧测试；完整迁移到 data source shortcut/defaulting 需要 P9/P10 database attach 后完成。
+- `database query --payload` 省略 id、`database page create --properties` 省略 id、`database property rename` 省略 data source id 仍未实现；需要 `.notion_mcp/state/database.attach.json` 的 active data source。
+- database id 自动解析单 data source、多 data source 要求显式指定尚未实现。
+- MCP tools 尚未同步 `database.sources`、`data_source.templates` 和 property rename。
+
+## 2026-06-08 V2/V3 P9/P10 Database attach 和 active data source defaulting
+
+官方文档检查：
+
+- 检查日期：2026-06-08。
+- 本阶段继续沿用 P7/P8 已检查的 Notion database/data source 文档：
+  - Retrieve a database: https://developers.notion.com/reference/retrieve-database
+  - Data source object: https://developers.notion.com/reference/data-source
+  - Query a data source: https://developers.notion.com/reference/query-a-data-source
+  - Parent object: https://developers.notion.com/reference/parent-object
+- 结论：database attach 必须记录 database container 和 active data source；query/page create/property rename 等表级操作使用 active data source。
+
+完成任务：
+
+- `V2V3-P9-001`：新增 database attachment store 测试。
+- `V2V3-P9-002`：新增 `database attach` CLI 测试。
+- `V2V3-P9-003`：新增 `database status/current/refresh` CLI 测试。
+- `V2V3-P9-004`：新增 `database detach/deattach` CLI 测试。
+- `V2V3-P9-005`：新增 attached database defaulting 测试。
+- `V2V3-P10-001`：实现 `DatabaseAttachment` model。
+- `V2V3-P10-002`：实现 `DatabaseAttachmentStore` load/save/delete。
+- `V2V3-P10-003`：实现 data source 按 id/name 匹配和多 source 错误。
+- `V2V3-P10-004`：实现 `database attach`。
+- `V2V3-P10-005`：实现 `database status/current/refresh`。
+- `V2V3-P10-006`：实现 `database detach/deattach`。
+- `V2V3-P10-007`：实现 attached database/data source context resolution。
+
+源码更新：
+
+- `src/notion_mcp/core/attachments/database_attachment.py`
+  - 新增 `DatabaseAttachment`、`AttachedDatabase`、`AttachedDataSource`。
+  - 新增 database title/data sources extraction、active data source selection 和 refresh helper。
+- `src/notion_mcp/core/attachments/attachment_store.py`
+  - 新增 `DatabaseAttachmentStore`。
+- `src/notion_mcp/core/attachments/context_resolver.py`
+  - 新增 `resolve_database_id()`、`resolve_data_source_id()`。
+- `src/notion_mcp/core/attachments/__init__.py`
+  - 导出 database attachment 相关 public symbols。
+- `src/notion_mcp/core/errors.py`
+  - 新增 `DatabaseAttachmentNotFoundError`、`ActiveDataSourceNotFoundError`、`DatabaseDataSourceSelectionError`。
+- `src/notion_mcp/cli/commands/databases.py`
+  - 新增 `database attach/status/current/refresh/detach/deattach`。
+  - `database retrieve/sources` 支持省略 database id，默认读取 attached database。
+  - `database query` 省略 id 时默认查询 attached active data source。
+  - `database page create` 省略 data source id 时默认使用 active data source。
+  - `database property rename` 支持 explicit data source id 或 attached active data source。
+
+测试更新：
+
+- `tests/v3/core/test_database_attachment_store.py`
+- `tests/v3/cli/test_database_attach.py`
+- `tests/v3/cli/test_database_status.py`
+- `tests/v3/cli/test_database_detach.py`
+- `tests/v3/cli/test_database_context_resolution.py`
+
+文档更新：
+
+- `Docs/dev/V2_V3_Trackable_Tasks.md`
+  - 将 P9/P10 任务标记为完成。
+  - 将 P7-004/P8-005 更新为完成，因为 attached active data source defaulting 已覆盖。
+- `Docs/User/Cli.md`
+  - 记录 database attach/status/current/refresh/detach/deattach 已实现。
+  - 记录 database query/page create/property rename 的省略 id 行为。
+- `Docs/User/Configuration.md`
+  - 更新当前已实现 database attach 和 defaulting 状态。
+- `Docs/Developer/api/cli.md`
+  - 记录 database attachment state 和 context resolution 边界。
+- `Docs/Developer/testing/cli.md`
+  - 记录新增 v3 database attachment/defaulting tests。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p9_pre UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p9_pre_env uv run pytest -q -p no:cacheprovider tests/v3/core/test_database_attachment_store.py tests/v3/cli/test_database_attach.py tests/v3/cli/test_database_status.py tests/v3/cli/test_database_detach.py tests/v3/cli/test_database_context_resolution.py`
+  - 首次结果：collection error；原因是尚未导出 `DatabaseAttachment` / `DatabaseAttachmentStore`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p9_post UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p9_post_env uv run pytest -q -p no:cacheprovider tests/v3/core/test_database_attachment_store.py tests/v3/cli/test_database_attach.py tests/v3/cli/test_database_status.py tests/v3/cli/test_database_detach.py tests/v3/cli/test_database_context_resolution.py`
+  - 中间结果：`8 failed, 2 passed`；失败原因是新测试误用了 Typer `CliRunner.isolated_filesystem`，已改为仓库现有的 `monkeypatch.chdir(tmp_path)` 风格。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p9_post2 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p9_post2_env uv run pytest -q -p no:cacheprovider tests/v3/core/test_database_attachment_store.py tests/v3/cli/test_database_attach.py tests/v3/cli/test_database_status.py tests/v3/cli/test_database_detach.py tests/v3/cli/test_database_context_resolution.py`
+  - 结果：`10 passed`
+
+后续验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p10_docs UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p10_docs_env uv run pytest -q -p no:cacheprovider tests/v2/scenarios/test_cli_documentation_inventory.py tests/v2/scenarios/test_stage7_documentation_completeness.py tests/v2/scenarios/test_stage8_release_readiness.py`
+  - 结果：`8 passed`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p10_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p10_full_env uv run pytest -q -p no:cacheprovider`
+  - 首次结果：`4 failed, 149 passed, 1 skipped, 1 warning`
+  - 失败原因：显式 id 场景也先查 project root，导致旧 v2 database CLI tests 在无 `.notion_mcp` 时失败。
+  - 修复：`resolve_database_id()` / `resolve_data_source_id()` 在显式 id 存在时直接返回，只有省略 id 时才读取 attachment。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p10_fix UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p10_fix_env uv run pytest -q -p no:cacheprovider tests/v2/cli/test_database_container.py tests/v2/cli/test_database_shortcut_commands.py tests/v3/cli/test_database_context_resolution.py`
+  - 结果：`8 passed`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p10_full2 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p10_full2_env uv run pytest -q -p no:cacheprovider`
+  - 结果：`153 passed, 1 skipped, 1 warning`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p10_full2 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p10_full2_env uv run ruff check .`
+  - 首次结果：1 个长 import 行；已拆行。
+  - 重跑结果：`All checks passed!`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p10_full2 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p10_full2_env uv run mypy src`
+  - 结果：`Success: no issues found in 79 source files`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p10_help1 uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp database --help`
+  - 结果：通过；help 显示 `attach/current/status/refresh/deattach/detach/retrieve/sources/create/update/rename/query/page/property`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p10_help2 uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp database attach --help`
+  - 结果：通过；help 显示 `--data-source`、`--verify/--no-verify`、`--require-project`、`--json`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p10_help3 uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp database page create --help`
+  - 结果：通过；`data_source_id` 为可选 argument，支持 attached active data source defaulting。
+- `find . -name __pycache__ -type d -print`
+  - 结果：无输出。
+- `test -d .venv && printf '.venv exists\n' || true`
+  - 结果：无输出。
+- `git diff --check`
+  - 结果：无输出。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；本阶段使用 fake services 和本地 state 文件，避免真实 workspace 写入。
+
+风险和后续：
+
+- Legacy `database query <database_id>` 仍保留，用于旧测试和旧入口兼容；用户文档优先推荐 data source 和 attached active data source 路径。
+- MCP tools 尚未同步 database attachment、database sources、data source templates/property rename。
+- 还需要补 P13 场景测试，验证从子目录发现 `.notion_mcp/config.json` 并完成 page/database attach workflow。
+
+## 2026-06-08 V2/V3 P11 MCP Tool Alignment
+
+官方文档检查：
+
+- 检查日期：2026-06-08。
+- 本阶段没有新增 Notion endpoint 语义；只把 P7/P8 已实现并已检查的 Core database/data_source 能力暴露到 MCP tool 层。
+- 继续沿用 P7/P8 已记录的官方 Notion database/data source 文档检查结果。
+
+完成任务：
+
+- `V2V3-P11-001`：新增 MCP database/data_source separation tests。
+- `V2V3-P11-002`：实现 MCP database/data_source 工具同步。
+- `V2V3-P11-003`：验证 page/block 相关 MCP tests 仍通过。
+- `V2V3-P14-004`：同步 MCP tool 文档。
+
+测试更新：
+
+- `tests/v2/mcp_tools/__init__.py`
+- `tests/v2/mcp_tools/test_database_data_source_tools.py`
+  - 验证 tool inventory 包含 `database_sources`、`database_rename`、`data_source_templates`、`data_source_property_rename`。
+  - 验证 database MCP tools 调用 `DatabasesService`。
+  - 验证 data source MCP tools 调用 `DataSourcesService`。
+  - 验证 database/data_source MCP tool 模块不调用 CLI，也不直接导入 Notion SDK。
+
+源码更新：
+
+- `src/notion_mcp/mcp_server/tools/databases.py`
+  - 将描述从 legacy database 改为 database container。
+  - 新增 `database_sources`。
+  - 新增 `database_rename`。
+  - 保留 `database_query` legacy 兼容入口，并提示优先使用 `data_source_query`。
+- `src/notion_mcp/mcp_server/tools/data_sources.py`
+  - `data_source_create` 支持可选 `database_id`，传入后调用 `create_for_database()`。
+  - 新增 `data_source_templates`。
+  - 新增 `data_source_property_rename`。
+
+文档更新：
+
+- `Docs/dev/V2_V3_Trackable_Tasks.md`
+  - 将 P11-001/P11-002/P11-003 标记为完成。
+  - 将 P14-004 标记为完成，P14-006 标记为持续进行中。
+- `Docs/Developer/mcp_tools/README.md`
+  - Tool inventory 从 42 更新为 46。
+- `Docs/Developer/mcp_tools/databases.md`
+  - 记录 database container MCP tools，包括 `database_sources` 和 `database_rename`。
+- `Docs/Developer/mcp_tools/data_sources.md`
+  - 记录 `data_source_create` with `database_id`、`data_source_templates`、`data_source_property_rename`。
+- `Docs/Developer/testing/cli.md`
+  - 记录新增 P11 MCP tests 和验证命令。
+- `Docs/Developer/api/cli.md`
+- `Docs/User/Cli.md`
+- `Docs/User/Configuration.md`
+  - 修正 P10/P11 之后仍保留的过期“待实施/计划”措辞。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p11_pre UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p11_pre_env uv run pytest -q -p no:cacheprovider tests/v2/mcp_tools/test_database_data_source_tools.py`
+  - 首次结果：`3 failed, 1 passed`。
+  - 失败原因：符合测试先行预期；MCP tool inventory 缺少 `database_sources`、`database_rename`、`data_source_templates`、`data_source_property_rename`，且 `data_source_create` 尚未支持 `database_id`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p11_after UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p11_after_env uv run pytest -q -p no:cacheprovider tests/v2/mcp_tools/test_database_data_source_tools.py`
+  - 结果：`4 passed`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p11_mcp UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p11_mcp_env uv run pytest -q -p no:cacheprovider tests/v2/mcp_server tests/v2/mcp_tools tests/v2/scenarios/test_mcp_to_core_to_fake_notion.py tests/v2/scenarios/test_mcp_client_flow.py`
+  - 结果：`18 passed`。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；P11 使用 fake Core services 验证 MCP 到 Core 的调用边界，不需要真实 workspace。
+- 本阶段尚未运行全量 pytest、ruff、mypy；后续 P13/P15 或最终验收会运行 release-relevant local checks。
+
+风险和后续：
+
+- P12 Raw API/version policy 测试仍未完成。
+- P13 场景测试仍未完成。
+- P15 最小交付闭环和全量 release checks 仍未完成。
+
+## 2026-06-08 V2/V3 P12 Raw API and Notion-Version policy
+
+官方文档检查：
+
+- 检查日期：2026-06-08。
+- Versioning - Notion Docs: https://developers.notion.com/reference/versioning
+  - 结论：Notion API 是 versioned API；REST 请求必须包含 `Notion-Version` header；新的 breaking API version 会改变字段或行为，因此本项目保持 pinned policy。
+- Upgrade guide - Notion Docs: https://developers.notion.com/guides/get-started/upgrade-guide-2026-03-11
+  - 结论：`2026-03-11` 包含 block positioning、trash/archive 语义和 block type rename 等 breaking changes；本项目继续要求版本集中配置并配套兼容性测试。
+
+完成任务：
+
+- `V2V3-P12-001`：新增 Raw API 定位测试。
+- `V2V3-P12-002`：新增 Notion-Version policy 测试。
+- `V2V3-P12-003`：重新检查官方 Notion versioning 和 2026-03-11 upgrade guide，并记录链接。
+
+测试更新：
+
+- `tests/v2/cli/test_raw_api_positioning.py`
+  - 验证 `raw-api operations --json` 仍可用。
+  - 验证 common page/database workflows 已有专用 CLI 命令。
+  - 验证 raw-api CLI help 和用户文档将 Raw API 定位为 advanced fallback。
+- `tests/v2/core/test_notion_version_policy.py`
+  - 验证默认 Notion-Version pinned。
+  - 验证 Notion-Version 从 global Core config 读取。
+  - 验证 SDK client factory 只注入配置中的 version。
+  - 验证 `src/notion_mcp` 中除配置层外没有散落硬编码版本字符串。
+
+源码更新：
+
+- `src/notion_mcp/cli/commands/raw_api.py`
+  - `raw-api` Typer help 改为 `Advanced fallback for registered raw API operations`。
+- `src/notion_mcp/routes/databases.py`
+  - 移除 legacy REST route 文档字符串中的具体 Notion API version 文本，改为引用当前配置的 Notion-Version。
+
+文档更新：
+
+- `Docs/dev/V2_V3_Trackable_Tasks.md`
+  - 将 P12-001/P12-002/P12-003 标记为完成。
+- `Docs/Developer/testing/cli.md`
+  - 记录 P12 新增测试文件和验证结果。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p12_pre UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p12_pre_env uv run pytest -q -p no:cacheprovider tests/v2/cli/test_raw_api_positioning.py tests/v2/core/test_notion_version_policy.py`
+  - 首次结果：`2 failed, 6 passed`。
+  - 失败原因：`raw-api --help` 未包含 advanced/fallback 定位；legacy REST route 文档字符串中仍有具体 Notion-Version。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p12_after UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p12_after_env uv run pytest -q -p no:cacheprovider tests/v2/cli/test_raw_api_positioning.py tests/v2/core/test_notion_version_policy.py`
+  - 结果：`8 passed`。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；P12 是本地 CLI/docs/config policy 测试，不需要真实 workspace。
+- 本阶段尚未运行全量 pytest、ruff、mypy；后续 P13/P15 或最终验收会运行 release-relevant local checks。
+
+风险和后续：
+
+- P13 场景测试仍未完成。
+- P15 最小交付闭环和全量 release checks 仍未完成。
+
+## 2026-06-08 V2/V3 P13 Scenario Tests
+
+完成任务：
+
+- `V2V3-P13-001`：新增 local page context workflow scenario。
+- `V2V3-P13-002`：新增 page content edit workflow scenario。
+- `V2V3-P13-003`：新增 database attach/query workflow scenario。
+- `V2V3-P13-004`：新增 project context discovery scenario。
+- `V2V3-P14-005`：同步测试文档中的 P13 场景测试说明。
+
+测试更新：
+
+- `tests/v3/scenarios/__init__.py`
+- `tests/v3/scenarios/test_attach_page_workflow.py`
+  - 覆盖 page attach、page status、从子目录执行 `page content`、page detach、missing attach error。
+- `tests/v2/scenarios/test_page_content_edit_workflow.py`
+  - 覆盖 content read、insert-after、append、update、remove。
+- `tests/v3/scenarios/test_attach_database_workflow.py`
+  - 覆盖 database attach、active data source query、显式 data source override、database page create/update、detach。
+- `tests/v3/scenarios/test_project_context_discovery.py`
+  - 覆盖 nested cwd project root discovery 和 missing project context remediation error。
+
+文档更新：
+
+- `Docs/dev/V2_V3_Trackable_Tasks.md`
+  - 将 P13-001/P13-002/P13-003/P13-004 标记为完成。
+  - 将 P14-005 标记为完成。
+- `Docs/Developer/testing/cli.md`
+  - 记录 P13 场景测试文件和验证命令。
+- `Docs/User/Configuration.md`
+  - 移除场景测试仍待实施的旧状态，补充真实 Notion integration 仍需显式启用。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p13_pre UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p13_pre_env uv run pytest -q -p no:cacheprovider tests/v3/scenarios/test_attach_page_workflow.py tests/v2/scenarios/test_page_content_edit_workflow.py tests/v3/scenarios/test_attach_database_workflow.py tests/v3/scenarios/test_project_context_discovery.py`
+  - 结果：`5 passed`。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；P13 使用 fake services 和本地 `.notion_mcp` state 验证用户工作流。
+
+风险和后续：
+
+- P15 最小交付闭环和全量 release checks 仍未完成。
+
+## 2026-06-08 V2/V3 P15 Minimum Delivery Verification
+
+完成任务：
+
+- `V2V3-P14-001`：用户配置文档同步完成。
+- `V2V3-P14-002`：用户 CLI 文档同步完成。
+- `V2V3-P14-003`：开发者 CLI API 文档同步完成。
+- `V2V3-P14-006`：阶段进度记录同步完成。
+- `V2V3-P15-001`：page attach minimum loop 已由 P13 fake scenario 覆盖。
+- `V2V3-P15-002`：database attach minimum loop 已由 P13 fake scenario 覆盖。
+- `V2V3-P15-003`：child directory discovery 已由 P13 fake scenario 覆盖。
+- `V2V3-P15-004`：release-relevant local checks 已运行。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p15_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p15_full_env uv run pytest -q -p no:cacheprovider`
+  - 首次结果：`1 failed, 169 passed, 1 skipped, 1 warning`。
+  - 失败原因：仓库根存在测试生成的 `__pycache__`，触发 release readiness 生成物检查。
+- `find . -name __pycache__ -type d -print`
+  - 结果：输出 `./__pycache__`。
+- `rm -rf __pycache__`
+  - 结果：通过；删除生成物。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p15_full2 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p15_full2_env uv run pytest -q -p no:cacheprovider`
+  - 结果：`170 passed, 1 skipped, 1 warning`。
+  - warning：外部 FastAPI/TestClient 的 StarletteDeprecationWarning。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p15_full2 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p15_full2_env uv run ruff check .`
+  - 结果：`All checks passed!`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p15_full2 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p15_full2_env uv run mypy src`
+  - 结果：`Success: no issues found in 79 source files`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p15_isolated uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp --help`
+  - 结果：通过；root help 显示 project/local/page/database/data-source/raw-api/mcp 等命令组，`raw-api` 显示 advanced fallback。
+- `find . -name __pycache__ -type d -print`
+  - 结果：无输出。
+- `test -d .venv && printf '.venv exists\n' || true`
+  - 结果：无输出。
+- `git diff --check`
+  - 结果：无输出。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；没有本轮用户提供的真实 token/workspace，也避免真实 Notion 写入。真实环境测试仍需显式 integration 配置后执行。
+
+当前风险和后续：
+
+- `database query <database_id>` legacy 兼容入口仍保留，用于旧测试和迁移；推荐路径是 `data-source query` 或 attached active data source defaulting。
+- `insert-before`、cache/index、local logs/audit、OAuth、GUI 仍是 deferred items，不属于本轮最小交付闭环。
+
+## 2026-06-08 V2/V3 P8 Final DatabaseService Boundary
+
+完成任务：
+
+- `V2V3-P8-001`：最终确认并实现 `DatabaseService` 只承载 database container 能力。
+
+完成度审计发现：
+
+- `Docs/dev/V2_V3_Trackable_Tasks.md` 中唯一非 deferred 未完成项是 `V2V3-P8-001`。
+- 原因是 `DatabasesService` 仍保留 legacy `query()`，这与 database container / data_source table-level 分离原则冲突。
+
+测试更新：
+
+- `tests/v2/core/test_database_service_container_only.py`
+  - 验证 `DatabasesService` 不暴露表级 `query`。
+- `tests/v2/cli/test_legacy_database_query_raw_api.py`
+  - 验证 legacy `database query <database_id>` 通过 Core Raw API 兼容路径调用 `databases.query`。
+- `tests/v2/mcp_tools/test_legacy_database_query_raw_api.py`
+  - 验证 legacy `database_query` MCP tool 通过 Core Raw API 兼容路径调用 `databases.query`。
+
+源码更新：
+
+- `src/notion_mcp/core/services/databases.py`
+  - 移除 `DatabasesService.query()`。
+- `src/notion_mcp/cli/commands/databases.py`
+  - legacy `database query <database_id>` 在真实 `DatabasesService` 无 `query` 时调用 `RawNotionService.invoke("databases.query", ...)`。
+  - 为旧 mock 测试保留 `hasattr(service, "query")` 兼容分支。
+- `src/notion_mcp/mcp_server/tools/databases.py`
+  - legacy `database_query` MCP tool 同样改为 Core Raw API 兼容路径。
+- `src/notion_mcp/cli/core_services.py`
+  - 更新 `DatabasesService` usage comment。
+
+文档更新：
+
+- `Docs/dev/V2_V3_Trackable_Tasks.md`
+  - 将 `V2V3-P8-001` 标记为完成。
+  - 记录 legacy database query 现在走 Core Raw API 兼容路径。
+- `Docs/Developer/api/cli.md`
+- `Docs/Developer/mcp_tools/databases.md`
+- `Docs/Developer/testing/cli.md`
+- `Docs/User/Cli.md`
+- `Docs/User/Guide.md`
+  - 同步 legacy database query 和 data source 推荐路径说明。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p8_final_pre UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p8_final_pre_env uv run pytest -q -p no:cacheprovider tests/v2/core/test_database_service_container_only.py tests/v2/cli/test_legacy_database_query_raw_api.py tests/v2/mcp_tools/test_legacy_database_query_raw_api.py`
+  - 首次结果：`3 failed`。
+  - 失败原因：符合测试先行预期；`DatabasesService.query()` 仍存在，CLI/MCP 没有 raw-api compatibility service getter。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_p8_final_after UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_p8_final_after_env uv run pytest -q -p no:cacheprovider tests/v2/core/test_database_service_container_only.py tests/v2/cli/test_legacy_database_query_raw_api.py tests/v2/mcp_tools/test_legacy_database_query_raw_api.py`
+  - 结果：`3 passed`。
+
+风险和后续：
+
+- 本阶段后需要重新运行全量 pytest、ruff、mypy、isolated help 和文档测试，确认 P8 finalization 没有破坏 P15 验收。
+
+## 2026-06-08 V2/V3 Final Re-verification After P8 Boundary Fix
+
+完成度审计：
+
+- `Docs/dev/V2_V3_Trackable_Tasks.md` 中除状态图例和 deferred items 外，没有 `[ ]`、`[~]` 或 `[!]` 未完成任务。
+- `V2V3-P8-001` 已完成，`DatabasesService` 不再暴露表级 `query`。
+- legacy `database query <database_id>` 和 MCP `database_query` 仍保留为兼容入口，但经 Core Raw API compatibility path 调用 `databases.query`。
+
+最终验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_final_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_final_full_env uv run pytest -q -p no:cacheprovider`
+  - 结果：`173 passed, 1 skipped, 1 warning`。
+  - warning：外部 FastAPI/TestClient 的 StarletteDeprecationWarning。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_final_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_final_full_env uv run ruff check .`
+  - 结果：`All checks passed!`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_final_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_final_full_env uv run mypy src`
+  - 结果：`Success: no issues found in 79 source files`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_final_isolated uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp --help`
+  - 结果：通过；root help 显示完整命令组，`raw-api` 显示 advanced fallback。
+- `find . -name __pycache__ -type d -print`
+  - 结果：无输出。
+- `test -d .venv && printf '.venv exists\n' || true`
+  - 结果：无输出。
+- `git diff --check`
+  - 结果：无输出。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；没有本轮用户提供的真实 token/workspace，也避免真实 Notion 写入。
+
+剩余 deferred items：
+
+- Stable `insert-before`。
+- Full cache/index support。
+- Local logs/audit。
+- OAuth。
+- GUI。
+
+## 2026-06-08 Config Global/Local Namespace Split
+
+背景：
+
+- 用户指出 `Docs/User/Configuration.md` 中 `notion-mcp config set notion_token ...` 和 `notion-mcp init --token ... --user-id ...` 容易混淆，不清楚是全局配置还是当前仓库配置。
+- 用户要求全局配置使用 `config global`，仓库级配置使用 `config local`。
+- 用户要求普通用户不需要手动填写 `user_id`。
+
+源码更新：
+
+- `src/notion_mcp/cli/commands/config.py`
+  - 新增 `notion-mcp config global set/get/list/unset`，行为等同旧全局 `config set/get/list/unset`。
+  - 新增 `notion-mcp config local init/status/root`，复用项目级 `.notion_mcp` context 命令。
+  - 保留旧 `notion-mcp config set/get/list/unset` 作为全局配置兼容入口。
+- `src/notion_mcp/cli/commands/init.py`
+  - `init` 不再缺省 prompt 用户 UUID；`--user-id` 和 `--user` 仅保留为可选兼容参数。
+- `src/notion_mcp/core/config.py`
+  - `init_core_config(..., user_id=None)` 支持不保存 configured user id。
+
+测试更新：
+
+- `tests/v2/cli/test_init.py`
+  - 新增 `test_init_does_not_require_user_id`。
+- `tests/v2/cli/test_config_commands.py`
+  - 新增 `test_config_global_namespace_targets_global_config`。
+  - 新增 `test_config_local_namespace_targets_project_config`。
+
+文档更新：
+
+- `Docs/User/Configuration.md`
+  - 明确全局 token 使用 `notion-mcp config global set notion_token ...`。
+  - 明确项目级配置使用 `notion-mcp config local init/status/root`。
+  - 移除普通流程中手动填写 `user_id` 的说明。
+- `Docs/User/Installation.md`
+- `Docs/User/Cli.md`
+- `Docs/User/Guide.md`
+- `Docs/User/MCP_Clients.md`
+- `Docs/User/Troubleshooting.md`
+- `Docs/Developer/api/cli.md`
+- `Docs/Developer/testing/cli.md`
+  - 同步配置命名空间和 user id 可选语义。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_config_split_pre UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_config_split_pre_env uv run pytest -q -p no:cacheprovider tests/v2/cli/test_init.py tests/v2/cli/test_config_commands.py`
+  - 首次结果：`3 failed, 4 passed`。
+  - 失败原因：符合测试先行预期；`init` 仍要求 `user_id`，`config global/local` 尚未实现。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_config_split_after UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_config_split_after_env uv run pytest -q -p no:cacheprovider tests/v2/cli/test_init.py tests/v2/cli/test_config_commands.py tests/v3/cli/test_project_init.py tests/v3/cli/test_project_status.py`
+  - 结果：`15 passed`。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；本阶段不需要真实 token/workspace。
+
+## 2026-06-08 Root Init Project Context Correction
+
+背景：
+
+- 用户进一步明确 `notion-mcp init` 应该用于项目级初始化，在当前项目中生成 `.notion_mcp/` 配置目录，而不是全局配置入口。
+- 全局配置继续使用 `notion-mcp config global ...`。
+- 项目级配置继续使用 root `notion-mcp init`、`notion-mcp project init`、`notion-mcp local init` 或 `notion-mcp config local init`。
+
+源码更新：
+
+- `src/notion_mcp/cli/commands/init.py`
+  - root `notion-mcp init` 改为 `project.init_command` 的薄别名。
+  - 不再写入 Core global config。
+  - 不再接收 `--token`、`--user-name`、`--user-id` 或 `--notion-version`。
+
+测试更新：
+
+- `tests/v2/cli/test_init.py`
+  - 改为验证 root `init` 创建项目级 `.notion_mcp/config.json`、`state/`、`cache/`、`logs/`。
+  - 验证 root `init` 不写 `NOTION_MCP_CONFIG` 指向的全局配置文件。
+  - 验证 `--token` 不再属于 root `init`。
+
+文档更新：
+
+- `Docs/User/Configuration.md`
+  - 明确 root `notion-mcp init` 是项目级初始化入口。
+  - 明确全局 token 只推荐 `notion-mcp config global set notion_token ...`。
+- `Docs/User/Cli.md`
+  - 初始化章节同步 root `init` 的项目级语义。
+- `Docs/User/Guide.md`
+  - 缺少 token 的排障提示改为 `config global set notion_token`。
+- `Docs/Developer/api/cli.md`
+  - 命令结构同步 root `init` 到 project init alias。
+- `Docs/Developer/testing/cli.md`
+  - 测试说明同步 root `init` 新合约。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_root_init_pre UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_root_init_pre_env uv run pytest -q -p no:cacheprovider tests/v2/cli/test_init.py`
+  - 首次结果：`2 failed`。
+  - 失败原因：符合测试先行预期；root `init` 仍是全局配置入口。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_root_init_after2 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_root_init_after2_env uv run pytest -q -p no:cacheprovider tests/v2/cli/test_init.py tests/v2/cli/test_config_commands.py tests/v3/cli/test_project_init.py tests/v3/cli/test_project_status.py`
+  - 结果：`14 passed`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_root_init_final UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_root_init_final_env uv run pytest -q -p no:cacheprovider tests/test_cli.py tests/v2/cli/test_init.py tests/v2/cli/test_config_commands.py tests/v3/cli/test_project_init.py tests/v3/cli/test_project_status.py tests/v2/scenarios/test_full_local_config_flow.py tests/v2/scenarios/test_cli_documentation_inventory.py tests/v2/scenarios/test_stage7_documentation_completeness.py tests/v2/scenarios/test_stage8_release_readiness.py`
+  - 结果：`26 passed`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_root_init_final UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_root_init_final_env uv run ruff check src tests/test_cli.py tests/v2/cli/test_init.py tests/v2/scenarios/test_full_local_config_flow.py`
+  - 结果：`All checks passed!`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_root_init_final UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_root_init_final_env uv run mypy src`
+  - 结果：`Success: no issues found in 79 source files`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_root_init_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_root_init_full_env uv run pytest -q -p no:cacheprovider`
+  - 结果：`175 passed, 1 skipped, 1 warning`。
+  - warning：外部 FastAPI/TestClient 的 StarletteDeprecationWarning。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_root_init_help uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp init --help`
+  - 结果：通过；root `init` help 只显示项目级参数。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_root_init_help uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp config global --help`
+  - 结果：通过；`config global` help 显示 `set/get/unset/list`。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；本阶段只修改本地 CLI 配置入口和文档。
+
+## 2026-06-08 Root CLI Help Text Fix
+
+背景：
+
+- 用户反馈 `notion-mcp --help` 的 Commands 表里 `init`、`status`、`set-token`、`set-user`、`show`、`run` 只有命令名，没有说明文字。
+- 原因是这些 root 直接命令通过动态注册加入 Typer，但注册时没有传入 `help=`。
+
+源码更新：
+
+- `src/notion_mcp/cli/commands/init.py`
+  - root `init` 注册时增加 `help` 文本。
+- `src/notion_mcp/cli/commands/status.py`
+  - root `status` 注册时增加 `help` 文本。
+- `src/notion_mcp/cli/commands/legacy.py`
+  - `set-token`、`set-user`、`show`、`run` 注册时增加 `help` 文本。
+- `src/notion_mcp/cli/commands/project.py`
+  - `project/local init/status/root` 动态子命令增加 `help` 文本。
+- `src/notion_mcp/cli/commands/config.py`
+  - `config global set/get/unset/list` 和 `config local init/status/root` 动态子命令增加 `help` 文本。
+
+测试更新：
+
+- `tests/v2/cli/test_help_text.py`
+  - 新增 root help 文本回归测试。
+  - 新增 project/config 动态子命令 help 文本回归测试。
+
+文档更新：
+
+- `Docs/Developer/testing/cli.md`
+  - 记录 `tests/v2/cli/test_help_text.py` 的覆盖范围。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_help_text_pre UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_help_text_pre_env uv run pytest -q -p no:cacheprovider tests/v2/cli/test_help_text.py`
+  - 首次结果：`2 failed`。
+  - 失败原因：符合测试先行预期；root 和动态子命令缺少 `help` 文本。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_help_text_after UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_help_text_after_env uv run pytest -q -p no:cacheprovider tests/v2/cli/test_help_text.py`
+  - 结果：`2 passed`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_help_text_after UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_help_text_after_env uv run notion-mcp --help`
+  - 结果：通过；root Commands 表现在显示 `init/status/set-token/set-user/show/run` 的说明文字。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_help_text_final UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_help_text_final_env uv run pytest -q -p no:cacheprovider tests/v2/cli/test_help_text.py tests/v2/cli/test_init.py tests/v2/cli/test_config_commands.py tests/v3/cli/test_project_init.py tests/v3/cli/test_project_status.py`
+  - 结果：`16 passed`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_help_text_final UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_help_text_final_env uv run ruff check src tests/v2/cli/test_help_text.py`
+  - 结果：`All checks passed!`
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_help_text_final UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_help_text_final_env uv run mypy src`
+  - 结果：`Success: no issues found in 79 source files`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_help_text_isolated uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp --help`
+  - 结果：通过；isolated install style 的 root Commands 表也显示说明文字。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；本阶段只修改 CLI help 文本。
+
+## 2026-06-08 English-Only Program Output
+
+背景：
+
+- 用户要求代码里的程序输出全部使用英文，例如 `notion_token 已更新` 这类中文输出不应继续存在。
+
+源码更新：
+
+- `src/notion_mcp/cli/commands/legacy.py`
+  - 将 legacy CLI prompt、echo 输出和 option help 文本改为英文。
+- `src/notion_mcp/cli/commands/config.py`
+  - 将 `config set/unset` 的 human output 改为英文：`updated`、`cleared`。
+- `src/notion_mcp/dependencies.py`
+  - 将缺少全局配置或 token 的 HTTP error detail 改为英文。
+- `src/notion_mcp/config.py`
+  - 将 legacy config 的异常文本和说明字符串改为英文。
+- `src/notion_mcp/models/config_model.py`
+  - 将 OpenAPI/schema 字段 description 改为英文。
+- `src/notion_mcp/server.py`
+  - 将 FastAPI app description 和模块说明改为英文。
+- `src/notion_mcp/routes/*.py`
+  - 将 route docstring、HTTP error detail 和说明字符串改为英文。
+- `src/notion_mcp/__init__.py`
+- `src/notion_mcp/routes/__init__.py`
+  - 将源码模块说明改为英文。
+
+测试更新：
+
+- `tests/v2/cli/test_english_output_text.py`
+  - 新增静态回归测试，扫描 `src/notion_mcp/**/*.py` 的字符串常量，禁止中文字符。
+
+文档更新：
+
+- `Docs/Developer/testing/cli.md`
+  - 记录英文输出静态测试。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_english_output_pre UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_english_output_pre_env uv run pytest -q -p no:cacheprovider tests/v2/cli/test_english_output_text.py tests/test_cli.py tests/v2/cli/test_config_commands.py`
+  - 结果：`8 passed`。
+- `rg -n "[\\p{Han}]" src/notion_mcp --glob '!README.md'`
+  - 结果：无源码中文命中。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_english_output_final UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_english_output_final_env uv run pytest -q -p no:cacheprovider tests/v2/cli/test_english_output_text.py tests/test_cli.py tests/v2/cli/test_config_commands.py tests/v2/cli/test_help_text.py`
+  - 结果：`10 passed`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_english_output_final UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_english_output_final_env uv run ruff check src tests/v2/cli/test_english_output_text.py`
+  - 结果：`All checks passed!`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_english_output_final UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_english_output_final_env uv run mypy src`
+  - 结果：`Success: no issues found in 79 source files`。
+- `env PYTHONDONTWRITEBYTECODE=1 NOTION_MCP_CONFIG=/private/tmp/notion_mcp_missing_config_for_full_english_output.json UV_CACHE_DIR=/private/tmp/notion_mcp_uv_english_output_full2 UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_english_output_full2_env uv run pytest -q -p no:cacheprovider`
+  - 结果：`178 passed, 1 skipped, 1 warning`。
+  - 说明：首次全量运行发现根目录生成了 `__pycache__/`，导致 release readiness artifact 检查失败；删除该生成物后重跑通过。另一个首次失败来自本机全局配置状态，重跑时使用缺失配置路径隔离环境。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；本阶段只修改本地输出文本。
+
+## 2026-06-08 Reader-Facing Docs Boundary
+
+背景：
+
+- 用户指出 `Docs/User/Cli.md` 中命令清单缺少逐条作用说明。
+- 用户要求 `Docs/dev` 之外的阅读文档不写 `v2/v3`、ADR、开发路径或测试路径这类开发资料。
+
+文档更新：
+
+- `Docs/User/Cli.md`
+  - 将顶部“阶段实现状态”改为“快速入口和命令作用”。
+  - 为 project/config/page/database/data-source 常用命令补充逐条作用说明。
+  - 将 `config local init/status/root`、legacy `config get/set/list/unset` 和 Raw API operations 拆成逐条说明。
+  - 保留用户需要知道的 `.notion_mcp` 项目路径和 attach state 路径，但移除 ADR、阶段和测试路径。
+- `Docs/User/Configuration.md`
+  - 删除 ADR 和阶段描述。
+  - 将项目级配置、page attach 和 database attach 改成用户可读的操作说明。
+- `Docs/User/Guide.md`
+  - 移除指向开发者文档路径的尾部引用。
+- `Docs/Requirements.md`、`Docs/Design.md`、`Docs/TechStack.md`、`Docs/Development_Plan.md`
+  - 移除非必要阶段、ADR、开发路径和测试目录表述。
+- `Docs/Developer/api/cli.md`
+- `Docs/Developer/mcp_tools/databases.md`
+- `Docs/Developer/mcp_tools/data_sources.md`
+- `Docs/Developer/testing/*.md`
+  - 将 ADR/阶段/逐测试路径叙述改为当前行为、对象边界和高层测试覆盖说明。
+
+测试更新：
+
+- `tests/v2/scenarios/test_documentation_reader_boundary.py`
+  - 新增文档边界测试。
+  - 验证 `Docs/User/*.md` 不包含 ADR、`v2/v3`、`Docs/dev`、`Docs/Developer` 或版本化测试路径。
+  - 验证 `Docs/dev` 之外的文档不引用 ADR、`Docs/dev` 或版本化测试路径。
+- `tests/v2/scenarios/test_stage1_documentation_alignment.py`
+  - 更新历史开发计划文档断言，适配非 dev 文档不再直接引用 `Docs/dev/...` 路径。
+
+验证命令和结果：
+
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_docs_reader_boundary UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_docs_reader_boundary_env uv run pytest -q -p no:cacheprovider tests/v2/scenarios/test_documentation_reader_boundary.py tests/v2/scenarios/test_cli_documentation_inventory.py tests/v2/scenarios/test_stage7_documentation_completeness.py tests/v2/scenarios/test_stage1_documentation_alignment.py tests/v2/cli/test_raw_api_positioning.py`
+  - 结果：`16 passed`。
+- `env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_docs_reader_boundary UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_docs_reader_boundary_env uv run ruff check tests/v2/scenarios/test_documentation_reader_boundary.py tests/v2/scenarios/test_stage1_documentation_alignment.py`
+  - 结果：`All checks passed!`。
+- `rg -n -i "\\b(ADR(?:-[0-9]+)?|v2/v3|Docs/dev(?:/|$)|tests/v[0-9])\\b" Docs --glob '!Docs/dev/**'`
+  - 结果：无命中。
+- `rg -n "Docs/Developer|Docs/dev|tests/v[0-9]|ADR|v2/v3|\\bv[23]\\b" Docs/User`
+  - 结果：无命中。
+- `env PYTHONDONTWRITEBYTECODE=1 NOTION_MCP_CONFIG=/private/tmp/notion_mcp_missing_config_for_docs_boundary_full.json UV_CACHE_DIR=/private/tmp/notion_mcp_uv_docs_boundary_full UV_PROJECT_ENVIRONMENT=/private/tmp/notion_mcp_docs_boundary_full_env uv run pytest -q -p no:cacheprovider`
+  - 结果：`180 passed, 1 skipped, 1 warning`。
+  - 说明：warning 来自外部 FastAPI/TestClient 依赖。
+
+未运行：
+
+- 未运行真实 Notion integration 测试；本阶段只修改文档和文档边界测试。

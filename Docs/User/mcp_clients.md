@@ -22,16 +22,14 @@ notion-mcp mcp serve --transport stdio
 先初始化本地 Notion 配置：
 
 ```bash
-notion-mcp init \
-  --token ntn_xxx \
-  --user-name "Ada" \
-  --user-id 01234567-89ab-cdef-0123-456789abcdef
+notion-mcp config --global user.token ntn_xxx
+notion-mcp config --global user.name "Ada"
 ```
 
 确认状态：
 
 ```bash
-notion-mcp status
+notion-mcp config --global --show
 ```
 
 ## 当前工具域
@@ -51,6 +49,83 @@ MCP client 可枚举以下工具域：
 - search
 - custom_emojis
 - raw_api
+
+## 当前 MCP Tool 清单
+
+配置和认证：
+
+- `config_status`
+- `config_get`
+- `auth_validate`
+- `auth_whoami`
+
+页面：
+
+- `page_retrieve`
+- `page_property_retrieve`
+- `page_create`
+- `page_update`
+- `page_trash`
+
+区块：
+
+- `block_children_list`
+- `block_append`
+- `block_update`
+- `block_trash`
+
+数据库：
+
+- `database_retrieve`
+- `database_query`
+- `database_create`
+- `database_update`
+
+数据源：
+
+- `data_source_retrieve`
+- `data_source_query`
+- `data_source_create`
+- `data_source_update`
+
+用户：
+
+- `user_me`
+- `user_list`
+- `user_retrieve`
+
+评论：
+
+- `comment_list`
+- `comment_create`
+- `comment_reply`
+
+视图：
+
+- `view_retrieve`
+- `view_list`
+- `view_query`
+- `view_create`
+- `view_update`
+
+文件上传：
+
+- `file_upload_retrieve`
+- `file_upload_list`
+- `file_upload_create`
+- `file_upload_send`
+- `file_upload_complete`
+
+搜索和自定义表情：
+
+- `search`
+- `custom_emoji_list`
+- `custom_emoji_retrieve`
+
+受控 Raw API：
+
+- `raw_api_registered_operations`
+- `raw_api_invoke`
 
 ## 安全说明
 

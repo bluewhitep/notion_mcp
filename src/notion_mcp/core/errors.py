@@ -89,6 +89,175 @@ class ConfigValidationError(CoreError):
         super().__init__(message, details=details)
 
 
+class ProjectConfigNotFoundError(CoreError):
+    default_code = "project_config_not_found"
+
+    # --------------------------------
+    # Function Description:
+    # Builds an error for a missing project-level configuration file.
+    # Inputs/Outputs:
+    # Input start path; output is ProjectConfigNotFoundError with remediation details.
+    # Usage:
+    # raise ProjectConfigNotFoundError("/workspace/project")
+    # --------------------------------
+    def __init__(self, start: str) -> None:
+        super().__init__(
+            "No .notion_mcp/config.json found from current directory or its parents.\n"
+            "Run:\n"
+            "  notion-mcp init\n"
+            "Or attach a page, which will initialize project context:\n"
+            "  notion-mcp page attach <page_id>",
+            details={"start": start},
+        )
+
+
+class ProjectAlreadyInitializedError(CoreError):
+    default_code = "project_already_initialized"
+
+    # --------------------------------
+    # Function Description:
+    # Builds an error when project init would overwrite an existing config.
+    # Inputs/Outputs:
+    # Input config path; output is ProjectAlreadyInitializedError.
+    # Usage:
+    # raise ProjectAlreadyInitializedError("/workspace/.notion_mcp/config.json")
+    # --------------------------------
+    def __init__(self, path: str) -> None:
+        super().__init__(
+            f"Project already initialized: {path}",
+            details={"path": path},
+        )
+
+
+class ProjectConfigValidationError(CoreError, ValueError):
+    default_code = "project_config_validation_failed"
+
+    # --------------------------------
+    # Function Description:
+    # Builds an error for invalid project-level configuration data.
+    # Inputs/Outputs:
+    # Input message/details; output is ProjectConfigValidationError.
+    # Usage:
+    # raise ProjectConfigValidationError("Project config must not contain token fields")
+    # --------------------------------
+    def __init__(
+        self,
+        message: str,
+        *,
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, details=details)
+
+
+class PageAttachmentNotFoundError(CoreError):
+    default_code = "page_attachment_not_found"
+
+    # --------------------------------
+    # Function Description:
+    # Builds an error when a command needs an attached page but no state exists.
+    # Inputs/Outputs:
+    # Input project root string; output is PageAttachmentNotFoundError.
+    # Usage:
+    # raise PageAttachmentNotFoundError("/workspace/project")
+    # --------------------------------
+    def __init__(self, project_root: str) -> None:
+        super().__init__(
+            "No page is attached for this project.\n"
+            "Run:\n"
+            "  notion-mcp page attach <page_id>\n"
+            "Or pass page_id explicitly:\n"
+            "  notion-mcp page retrieve <page_id>",
+            details={"project_root": project_root},
+        )
+
+
+class DatabaseAttachmentNotFoundError(CoreError):
+    default_code = "database_attachment_not_found"
+
+    # --------------------------------
+    # Function Description:
+    # Builds an error when a command needs an attached database but no state exists.
+    # Inputs/Outputs:
+    # Input project root string; output is DatabaseAttachmentNotFoundError.
+    # Usage:
+    # raise DatabaseAttachmentNotFoundError("/workspace/project")
+    # --------------------------------
+    def __init__(self, project_root: str) -> None:
+        super().__init__(
+            "No database is attached for this project.\n"
+            "Run:\n"
+            "  notion-mcp database attach <database_id>\n"
+            "Or pass id explicitly:\n"
+            "  notion-mcp database retrieve <database_id>",
+            details={"project_root": project_root},
+        )
+
+
+class ActiveDataSourceNotFoundError(CoreError):
+    default_code = "active_data_source_not_found"
+
+    # --------------------------------
+    # Function Description:
+    # Builds an error when a table-level command needs an active data source.
+    # Inputs/Outputs:
+    # Input project root/database id; output is ActiveDataSourceNotFoundError.
+    # Usage:
+    # raise ActiveDataSourceNotFoundError("/workspace/project", "database-id")
+    # --------------------------------
+    def __init__(self, project_root: str, database_id: str | None = None) -> None:
+        super().__init__(
+            "Attached database has no active data source.\n"
+            "This command requires a data source.\n"
+            "Run:\n"
+            "  notion-mcp database status --refresh\n"
+            "Or:\n"
+            "  notion-mcp database attach <database_id> --data-source <data_source_id_or_name>",
+            details={"project_root": project_root, "database_id": database_id},
+        )
+
+
+class DatabaseDataSourceSelectionError(CoreError):
+    default_code = "database_data_source_selection_required"
+
+    # --------------------------------
+    # Function Description:
+    # Builds an error when database attach cannot choose one active data source.
+    # Inputs/Outputs:
+    # Input database id, source list, and optional selector; output is CoreError.
+    # Usage:
+    # raise DatabaseDataSourceSelectionError("db", sources=[], selector=None)
+    # --------------------------------
+    def __init__(
+        self,
+        database_id: str,
+        *,
+        sources: list[dict[str, Any]],
+        selector: str | None,
+    ) -> None:
+        source_lines = "\n".join(
+            f"  {index}. {source.get('name') or ''} {source.get('id') or ''}".rstrip()
+            for index, source in enumerate(sources, start=1)
+        )
+        if selector:
+            message = (
+                f"Data source selector did not match this database: {selector}\n"
+                f"Database: {database_id}\n"
+                f"Data sources:\n{source_lines}"
+            )
+        else:
+            message = (
+                "This database contains multiple data sources.\n"
+                f"Database: {database_id}\n"
+                f"Data sources:\n{source_lines}\n"
+                "Please attach again with:\n"
+                "  notion-mcp database attach <database_id> --data-source <data_source_id_or_name>"
+            )
+        super().__init__(
+            message,
+            details={"database_id": database_id, "sources": sources, "selector": selector},
+        )
+
+
 class NotionAuthError(CoreError):
     default_code = "notion_auth_failed"
 

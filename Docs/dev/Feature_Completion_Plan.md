@@ -2,9 +2,37 @@
 
 本文档用于把当前原型补全为符合目标需求的本地 Notion MCP 服务器。它是开发者对象文档，放在 `Docs/dev/` 下，只描述开发计划、约束、阶段和验收标准；面向使用者的安装与使用说明仍放在 `Docs/User/` 下。
 
-## 当前结论
+## v2 ADR 补充
 
-当前仓库不是完整 MCP 服务器，而是一个 FastAPI REST 原型加 Typer CLI。
+`Docs/dev/ADR-002-local-context-and-cli-v2.md` 是已接受并已按 `Docs/dev/V2_V3_Trackable_Tasks.md` 完成最小闭环实现的 v2 设计决议。它补充本计划之后的产品层目标：
+
+- Git-like 本地目录上下文配置。
+- Page CLI 作为普通用户编辑页面内容的主入口。
+- Block CLI 作为高级/底层入口。
+- Database 和 DataSource 严格分离。
+- Raw API 降级为兜底和高级入口。
+
+ADR-002 中列出的命令和边界已经进入 v2/v3 实施闭环；当前精确实现状态仍以源码、`Docs/User/Cli.md`、`Docs/Developer/api/cli.md` 和 `Docs/dev/progress.md` 为准。
+
+`Docs/dev/ADR-003-project-attach-context.md` 是已接受并已按 `Docs/dev/V2_V3_Trackable_Tasks.md` 完成最小闭环实现的 runtime 工作流设计。它将 ADR-002 的本地上下文进一步收敛为项目级 `.notion_mcp` 目录和 page/database attach state 工作流：
+
+- 项目级配置文件：`.notion_mcp/config.json`。
+- Page attach 状态：`.notion_mcp/state/page.attach.json`。
+- Database attach 状态：`.notion_mcp/state/database.attach.json`。
+- 标准命令：`project init/status/root`、`page attach/status/refresh/detach`、`database attach/status/refresh/detach`。
+- 兼容别名：`local ...` 和 `deattach`。
+- 测试目录：`tests/v3/core/`、`tests/v3/cli/`、`tests/v3/scenarios/`。
+
+当前 project context 和 attach workflow 以 ADR-003 为准；ADR-002 中 Database/DataSource 分离、Page CLI 主入口和 Raw API 兜底原则仍然有效。
+
+开发实施入口：
+
+- `Docs/dev/V2_V3_Development_Design.md`：把 ADR-002 和 ADR-003 转换为实现导向的开发设计，包括 Core/CLI/MCP 边界、项目配置、attach state、Database/DataSource 分离和测试策略。
+- `Docs/dev/V2_V3_Trackable_Tasks.md`：把后续实现拆成带任务 ID、依赖、输出文件、测试和验收标准的可追踪任务列表。
+
+## 历史基线结论
+
+以下结论记录 2026-06-07 阶段 0 启动时的历史基线，不代表当前 v2/v3 最终状态。当前实现状态以 `Docs/dev/V2_V3_Trackable_Tasks.md` 和 `Docs/dev/progress.md` 为准。
 
 已确认的现状：
 
@@ -82,10 +110,25 @@ Docs/
     mcp_tools/
     testing/
   User/
-    installation.md
-    configuration.md
-    cli.md
-    mcp_clients.md
+    Installation.md
+    Configuration.md
+    Cli.md
+    Cli/
+      Overview.md
+      Project_Config.md
+      Page.md
+      Block.md
+      Database_DataSource.md
+      Auth_And_User.md
+      Comments.md
+      Views.md
+      File_Uploads.md
+      Search_And_Custom_Emoji.md
+      Raw_API.md
+      MCP_Server.md
+      Legacy_Commands.md
+    MCP_Clients.md
+    Troubleshooting.md
   dev/
     Feature_Completion_Plan.md
     progress.md
@@ -418,15 +461,15 @@ tests/
 
 使用者文档：
 
-- `Docs/User/installation.md`
+- `Docs/User/Installation.md`
   - uv 隔离安装、pip 安装、卸载。
-- `Docs/User/configuration.md`
+- `Docs/User/Configuration.md`
   - token、user UUID、用户名、API version、配置路径。
-- `Docs/User/cli.md`
+- `Docs/User/Cli.md`
   - git-like CLI 使用方法。
-- `Docs/User/mcp_clients.md`
+- `Docs/User/MCP_Clients.md`
   - Codex、Claude、Cursor、VS Code 等 MCP client 配置。
-- `Docs/User/troubleshooting.md`
+- `Docs/User/Troubleshooting.md`
   - token、权限、Notion API version、rate limit、MCP handshake 常见问题。
 
 验收：
@@ -434,7 +477,7 @@ tests/
 - 开发者文档不写普通用户教程。
 - 使用者文档不暴露内部设计细节。
 - 每个已实现功能都有对应开发者文档。
-- 用户可按 `Docs/User/installation.md` 从零安装并启动。
+- 用户可按 `Docs/User/Installation.md` 从零安装并启动。
 
 ## 阶段 8：发布前验收
 

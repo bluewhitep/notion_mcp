@@ -14,11 +14,24 @@ def test_stage7_required_documentation_files_exist() -> None:
         "Docs/Developer/testing/live.md",
         "Docs/Developer/testing/scenarios.md",
         "Docs/Developer/packaging.md",
-        "Docs/User/installation.md",
-        "Docs/User/configuration.md",
-        "Docs/User/cli.md",
-        "Docs/User/mcp_clients.md",
-        "Docs/User/troubleshooting.md",
+        "Docs/User/Installation.md",
+        "Docs/User/Configuration.md",
+        "Docs/User/Cli.md",
+        "Docs/User/Cli/Overview.md",
+        "Docs/User/Cli/Project_Config.md",
+        "Docs/User/Cli/Page.md",
+        "Docs/User/Cli/Block.md",
+        "Docs/User/Cli/Database_DataSource.md",
+        "Docs/User/Cli/Auth_And_User.md",
+        "Docs/User/Cli/Comments.md",
+        "Docs/User/Cli/Views.md",
+        "Docs/User/Cli/File_Uploads.md",
+        "Docs/User/Cli/Search_And_Custom_Emoji.md",
+        "Docs/User/Cli/Raw_API.md",
+        "Docs/User/Cli/MCP_Server.md",
+        "Docs/User/Cli/Legacy_Commands.md",
+        "Docs/User/MCP_Clients.md",
+        "Docs/User/Troubleshooting.md",
     ]
 
     for relative_path in required:
@@ -28,10 +41,17 @@ def test_stage7_required_documentation_files_exist() -> None:
 def test_user_docs_do_not_expose_internal_source_paths() -> None:
     user_docs = REPO_ROOT / "Docs" / "User"
 
-    for path in user_docs.glob("*.md"):
+    for path in user_docs.rglob("*.md"):
         text = path.read_text(encoding="utf-8")
         assert "src/notion_mcp" not in text
         assert "tests/v2" not in text
+
+
+def test_user_doc_file_names_start_with_uppercase_letter() -> None:
+    user_docs = REPO_ROOT / "Docs" / "User"
+
+    for path in user_docs.rglob("*.md"):
+        assert path.name[0].isupper(), path.relative_to(REPO_ROOT)
 
 
 def test_developer_docs_state_core_cli_mcp_boundary() -> None:

@@ -28,9 +28,18 @@ def get_custom_emojis_service():
 
 
 @app.command(name="list")
-def list_emojis(json_output: bool = typer.Option(False, "--json")) -> None:
+def list_emojis(
+    page_size: int | None = typer.Option(None, "--page-size"),
+    start_cursor: str | None = typer.Option(None, "--start-cursor"),
+    json_output: bool = typer.Option(False, "--json"),
+) -> None:
+    params: dict[str, object] = {}
+    if page_size is not None:
+        params["page_size"] = page_size
+    if start_cursor is not None:
+        params["start_cursor"] = start_cursor
     try:
-        result = get_custom_emojis_service().list()
+        result = get_custom_emojis_service().list(**params)
     except CoreError as exc:
         exit_with_error(exc, json_output=json_output)
     echo_json(result) if json_output else typer.echo(result)

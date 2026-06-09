@@ -25,6 +25,14 @@ class Recorder:
         self.calls.append(("update", kwargs))
         return {"method": f"{self.name}.update", "kwargs": kwargs}
 
+    def list(self, **kwargs: object) -> dict[str, object]:
+        self.calls.append(("list", kwargs))
+        return {"results": [], "has_more": False, "next_cursor": None, "kwargs": kwargs}
+
+    def query(self, **kwargs: object) -> dict[str, object]:
+        self.calls.append(("query", kwargs))
+        return {"method": f"{self.name}.query", "kwargs": kwargs}
+
 
 class ChildrenRecorder(Recorder):
     def list(self, **kwargs: object) -> dict[str, object]:
@@ -42,10 +50,30 @@ class BlocksRecorder(Recorder):
         self.children = ChildrenRecorder("blocks.children")
 
 
+class ViewsWithoutQuery:
+    def __init__(self) -> None:
+        self.queries = Recorder("views.queries")
+
+
+class CustomEmojisWithoutRetrieve:
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, dict[str, object]]] = []
+
+    def list(self, **kwargs: object) -> dict[str, object]:
+        self.calls.append(("list", kwargs))
+        return {
+            "results": [{"id": "emoji-1", "name": "smile", "url": "https://example.com/smile.png"}],
+            "has_more": False,
+            "next_cursor": None,
+        }
+
+
 class FakeClient:
     def __init__(self) -> None:
         self.pages = Recorder("pages")
         self.blocks = BlocksRecorder()
+        self.views = ViewsWithoutQuery()
+        self.custom_emojis = CustomEmojisWithoutRetrieve()
 
 
 def test_pages_service_wraps_sdk_operations() -> None:
@@ -117,6 +145,22 @@ def test_raw_api_invokes_only_registered_operations() -> None:
     assert client.pages.calls[-1] == ("retrieve", {"page_id": "page-1"})
     assert "pages.retrieve" in registered_operations()
     assert "custom_emojis.list" in registered_operations()
+
+
+def test_raw_api_uses_service_fallbacks_for_sdk_endpoint_gaps() -> None:
+    client = FakeClient()
+    service = RawNotionService(client)
+
+    emoji = service.invoke("custom_emojis.retrieve", {"custom_emoji_id": "emoji-1"})
+    view_query = service.invoke("views.query", {"view_id": "view-1", "page_size": 10})
+
+    assert emoji["name"] == "smile"
+    assert client.custom_emojis.calls[-1] == ("list", {"page_size": 100})
+    assert view_query["method"] == "views.queries.create"
+    assert client.views.queries.calls[-1] == (
+        "create",
+        {"view_id": "view-1", "page_size": 10},
+    )
 
 
 def test_raw_api_rejects_unregistered_or_private_operations() -> None:

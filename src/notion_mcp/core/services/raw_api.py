@@ -76,13 +76,29 @@ class RawNotionService(BaseNotionService):
     def invoke(self, operation: str, arguments: dict[str, Any] | None = None) -> dict[str, Any]:
         if operation not in OPERATION_REGISTRY:
             raise NotionOperationError(operation, "Operation is not registered")
+        arguments = arguments or {}
+        if operation == "custom_emojis.retrieve":
+            from .custom_emojis import CustomEmojisService
+
+            custom_emoji_id = arguments.get("custom_emoji_id")
+            if not isinstance(custom_emoji_id, str) or not custom_emoji_id:
+                raise NotionOperationError(operation, "custom_emoji_id is required")
+            return CustomEmojisService(self.client).retrieve(custom_emoji_id)
+        if operation == "views.query":
+            from .views import ViewsService
+
+            view_id = arguments.get("view_id")
+            if not isinstance(view_id, str) or not view_id:
+                raise NotionOperationError(operation, "view_id is required")
+            payload = {key: value for key, value in arguments.items() if key != "view_id"}
+            return ViewsService(self.client).query(view_id, payload)
         path = OPERATION_REGISTRY[operation]
         if any(part.startswith("_") for part in path):
             raise NotionOperationError(operation, "Private SDK attributes are not allowed")
         target = self._resolve_path(operation, path)
         if not callable(target):
             raise NotionOperationError(operation, "Registered operation is not callable")
-        return self._call(operation, target, **(arguments or {}))
+        return self._call(operation, target, **arguments)
 
     # --------------------------------
     # Function Description:

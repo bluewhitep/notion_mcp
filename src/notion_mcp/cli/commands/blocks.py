@@ -101,3 +101,147 @@ def append(
         echo_json(result)
     else:
         typer.echo(result)
+
+
+@app.command(name="insert-after")
+# --------------------------------
+# Function Description:
+# Inserts block children after an existing sibling block.
+# Inputs/Outputs:
+# Input target block id and payload; output is append result or dry-run payload.
+# Usage:
+# notion-mcp block insert-after BLOCK_ID --payload '{"children": []}'
+# --------------------------------
+def insert_after(
+    block_id: str,
+    payload: str = typer.Option(..., "--payload", help="JSON payload with children"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Do not call Notion"),
+    json_output: bool = typer.Option(False, "--json", help="Print JSON output"),
+) -> None:
+    data = parse_json_object(payload)
+    children_list = _children_from_payload(data)
+    position = {"type": "after_block", "after_block": {"id": block_id}}
+    if dry_run:
+        result = dry_run_result("blocks.children.append", {"after": block_id, "position": position, **data}).__dict__
+    else:
+        try:
+            target = get_blocks_service().retrieve(block_id)
+            parent_id = _parent_id_for_append(target)
+            result = get_blocks_service().append_children(parent_id, children=children_list, position=position)
+        except CoreError as exc:
+            exit_with_error(exc, json_output=json_output)
+    if json_output:
+        echo_json(result)
+    else:
+        typer.echo(result)
+
+
+@app.command(name="update")
+# --------------------------------
+# Function Description:
+# Updates a block through Core or prints dry-run payload.
+# Inputs/Outputs:
+# Input block id and JSON payload; output is update result or dry-run result.
+# Usage:
+# notion-mcp block update BLOCK_ID --payload '{"paragraph": {}}'
+# --------------------------------
+def update(
+    block_id: str,
+    payload: str = typer.Option(..., "--payload", help="JSON payload for blocks.update"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Do not call Notion"),
+    json_output: bool = typer.Option(False, "--json", help="Print JSON output"),
+) -> None:
+    data = parse_json_object(payload)
+    if dry_run:
+        result = dry_run_result("blocks.update", {"block_id": block_id, **data}).__dict__
+    else:
+        try:
+            result = get_blocks_service().update(block_id, data)
+        except CoreError as exc:
+            exit_with_error(exc, json_output=json_output)
+    if json_output:
+        echo_json(result)
+    else:
+        typer.echo(result)
+
+
+@app.command(name="trash")
+# --------------------------------
+# Function Description:
+# Moves a block to trash through Core or prints dry-run payload.
+# Inputs/Outputs:
+# Input block id; output is trash result or dry-run result.
+# Usage:
+# notion-mcp block trash BLOCK_ID --json
+# --------------------------------
+def trash(
+    block_id: str,
+    dry_run: bool = typer.Option(False, "--dry-run", help="Do not call Notion"),
+    json_output: bool = typer.Option(False, "--json", help="Print JSON output"),
+) -> None:
+    if dry_run:
+        result = dry_run_result("blocks.delete", {"block_id": block_id}).__dict__
+    else:
+        try:
+            result = get_blocks_service().trash(block_id)
+        except CoreError as exc:
+            exit_with_error(exc, json_output=json_output)
+    if json_output:
+        echo_json(result)
+    else:
+        typer.echo(result)
+
+
+@app.command(name="remove", hidden=True)
+# --------------------------------
+# Function Description:
+# Hidden compatibility alias for block trash.
+# Inputs/Outputs:
+# Input block id; delegates to trash.
+# Usage:
+# notion-mcp block remove BLOCK_ID
+# --------------------------------
+def remove(
+    block_id: str,
+    dry_run: bool = typer.Option(False, "--dry-run", help="Do not call Notion"),
+    json_output: bool = typer.Option(False, "--json", help="Print JSON output"),
+) -> None:
+    trash(block_id=block_id, dry_run=dry_run, json_output=json_output)
+
+
+# --------------------------------
+# Function Description:
+# Extracts children list from a block append payload.
+# Inputs/Outputs:
+# Input parsed payload; returns child block list.
+# Usage:
+# _children_from_payload({"children": []})
+# --------------------------------
+def _children_from_payload(data: dict[str, object]) -> list[dict[str, object]]:
+    children = data.get("children", [])
+    if not isinstance(children, list):
+        return []
+    return [child for child in children if isinstance(child, dict)]
+
+
+# --------------------------------
+# Function Description:
+# Finds the parent id to pass as block_id for append-after operations.
+# Inputs/Outputs:
+# Input target block response; returns parent page/block/data source id.
+# Usage:
+# _parent_id_for_append(block)
+# --------------------------------
+def _parent_id_for_append(block: dict[str, object]) -> str:
+    parent = block.get("parent")
+    if isinstance(parent, dict):
+        parent_type = parent.get("type")
+        if isinstance(parent_type, str):
+            typed_value = parent.get(parent_type)
+            if isinstance(typed_value, str):
+                return typed_value
+        for key in ("page_id", "block_id", "data_source_id", "database_id"):
+            value = parent.get(key)
+            if isinstance(value, str):
+                return value
+    raise CoreError("Cannot determine parent for target block", details={"block": block})

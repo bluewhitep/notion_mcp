@@ -118,11 +118,11 @@ def test_custom_emoji_list_calls_core_service(monkeypatch) -> None:
     service = FakeService()
     monkeypatch.setattr(custom_emojis, "get_custom_emojis_service", lambda: service)
 
-    result = runner.invoke(app, ["custom-emoji", "list", "--json"])
+    result = runner.invoke(app, ["custom-emoji", "list", "--page-size", "5", "--start-cursor", "cursor-1", "--json"])
 
     assert result.exit_code == 0
     assert json.loads(result.stdout)["results"] == []
-    assert service.calls == [("list", {})]
+    assert service.calls == [("list", {"page_size": 5, "start_cursor": "cursor-1"})]
 
 
 def test_raw_api_invoke_calls_core_service(monkeypatch) -> None:

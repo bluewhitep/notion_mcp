@@ -1,110 +1,37 @@
-# CLI 使用说明
+# CLI 文档目录
 
-本文面向使用者，说明如何使用 `notion-mcp` 命令行工具。
+本文是 `notion-mcp` CLI 的使用入口。具体命令已经按主题拆分到下方分册，避免把 page、block、database、配置和高级入口混在同一个文件里。
 
-## 初始化
+## 先读
 
-```bash
-notion-mcp init \
-  --token ntn_xxx \
-  --user-name "Ada" \
-  --user-id 01234567-89ab-cdef-0123-456789abcdef
-```
+- [Installation](Installation.md)：安装 `notion-mcp`。
+- [Configuration](Configuration.md)：准备 Notion connection、设置 token、创建项目级上下文。
+- [MCP Clients](MCP_Clients.md)：让 MCP client 启动本地 Notion MCP server。
+- [Troubleshooting](Troubleshooting.md)：常见错误和排查入口。
 
-查看状态：
+## CLI 分册
 
-```bash
-notion-mcp status
-notion-mcp status --json
-```
+- [Overview](Cli/Overview.md)：通用规则、JSON 参数、`--dry-run` 和命令别名。
+- [Project Config](Cli/Project_Config.md)：`init`、`pwd`、`version` 和 `config --global/--local`。
+- [Page](Cli/Page.md)：绑定默认 page、读取 page、读取 blocks、创建和更新 page。
+- [Block](Cli/Block.md)：append、insert-after、update、trash 等 block 操作。
+- [Database DataSource](Cli/Database_DataSource.md)：database 容器、data source 表级操作和 database 快捷命令。
+- [Auth And User](Cli/Auth_And_User.md)：token 校验、whoami 和 user 查询。
+- [Comments](Cli/Comments.md)：读取、创建和回复 comments。
+- [Views](Cli/Views.md)：读取、列出、查询、创建和更新 views。
+- [File Uploads](Cli/File_Uploads.md)：file upload 生命周期命令。
+- [Search And Custom Emoji](Cli/Search_And_Custom_Emoji.md)：workspace 搜索和 custom emoji。
+- [Raw API](Cli/Raw_API.md)：高级兜底 Raw API 入口。
+- [MCP Server](Cli/MCP_Server.md)：启动本地 MCP server。
+- [Legacy Commands](Cli/Legacy_Commands.md)：旧脚本兼容命令。
 
-## 配置
-
-```bash
-notion-mcp config list
-notion-mcp config get user_name
-notion-mcp config set user_name "Ada Lovelace"
-notion-mcp config unset user_name
-```
-
-token 默认不会明文显示。
-
-## 页面
+## 常用起步顺序
 
 ```bash
-notion-mcp page retrieve <page_id> --json
-notion-mcp page create --payload '{"parent": {"page_id": "<parent_id>"}}' --dry-run --json
+notion-mcp config --global user.token ntn_xxx
+notion-mcp config --global --show
+notion-mcp init --project-name "Demo"
+notion-mcp page attach <page_id>
+notion-mcp page retrieve
+notion-mcp page blocks
 ```
-
-## 区块
-
-```bash
-notion-mcp block children <block_id> --json
-notion-mcp block append <block_id> --payload '{"children": []}' --dry-run --json
-```
-
-## 数据库
-
-```bash
-notion-mcp database retrieve <database_id> --json
-notion-mcp database query <database_id> --payload '{"page_size": 10}' --json
-```
-
-## 数据源
-
-```bash
-notion-mcp data-source retrieve <data_source_id> --json
-notion-mcp data-source query <data_source_id> --payload '{"page_size": 10}' --json
-```
-
-## 用户
-
-```bash
-notion-mcp user me --json
-notion-mcp user list --page-size 10 --json
-notion-mcp user retrieve <user_id> --json
-```
-
-## 评论
-
-```bash
-notion-mcp comment list --block-id <block_id> --json
-notion-mcp comment create --payload '{"parent": {"page_id": "<page_id>"}, "rich_text": []}' --dry-run --json
-```
-
-## 视图
-
-```bash
-notion-mcp view retrieve <view_id> --json
-notion-mcp view query <view_id> --payload '{"page_size": 10}' --json
-```
-
-## 文件上传
-
-```bash
-notion-mcp file-upload retrieve <file_upload_id> --json
-notion-mcp file-upload create --payload '{"mode": "single_part"}' --dry-run --json
-```
-
-## 搜索和自定义表情
-
-```bash
-notion-mcp search query --payload '{"query": "Roadmap"}' --json
-notion-mcp custom-emoji list --json
-```
-
-## 受控 Raw API
-
-```bash
-notion-mcp raw-api operations --json
-notion-mcp raw-api invoke pages.retrieve --arguments '{"page_id": "<page_id>"}' --json
-```
-
-## MCP
-
-```bash
-notion-mcp mcp serve --help
-notion-mcp mcp serve --transport stdio
-```
-
-`mcp serve` 会启动本地 MCP server，供支持 MCP 的客户端通过 stdio 调用。

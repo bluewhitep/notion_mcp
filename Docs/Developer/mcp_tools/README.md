@@ -25,6 +25,57 @@
 - `custom_emojis.md`
 - `raw_api.md`
 
+## Tool Inventory
+
+当前 server 可枚举 46 个 tools：
+
+- `auth_validate`
+- `auth_whoami`
+- `block_append`
+- `block_children_list`
+- `block_trash`
+- `block_update`
+- `comment_create`
+- `comment_list`
+- `comment_reply`
+- `config_get`
+- `config_status`
+- `custom_emoji_list`
+- `custom_emoji_retrieve`
+- `data_source_create`
+- `data_source_property_rename`
+- `data_source_query`
+- `data_source_retrieve`
+- `data_source_templates`
+- `data_source_update`
+- `database_create`
+- `database_query`
+- `database_rename`
+- `database_retrieve`
+- `database_sources`
+- `database_update`
+- `file_upload_complete`
+- `file_upload_create`
+- `file_upload_list`
+- `file_upload_retrieve`
+- `file_upload_send`
+- `page_create`
+- `page_property_retrieve`
+- `page_retrieve`
+- `page_trash`
+- `page_update`
+- `raw_api_invoke`
+- `raw_api_registered_operations`
+- `search`
+- `user_list`
+- `user_me`
+- `user_retrieve`
+- `view_create`
+- `view_list`
+- `view_query`
+- `view_retrieve`
+- `view_update`
+
 ## 公共规则
 
 - MCP Tool 只能调用 Core，不能调用 CLI。

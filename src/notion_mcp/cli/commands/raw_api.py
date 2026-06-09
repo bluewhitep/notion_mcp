@@ -16,7 +16,7 @@ from notion_mcp.core.services.raw_api import registered_operations
 from ..core_services import get_raw_api_service as _get_raw_api_service
 from ..formatting import echo_json, exit_with_error, parse_json_object
 
-app = typer.Typer(add_completion=False, help="Registered raw API operations")
+app = typer.Typer(add_completion=False, help="Advanced fallback for registered raw API operations")
 
 
 def register(root_app: typer.Typer) -> None:

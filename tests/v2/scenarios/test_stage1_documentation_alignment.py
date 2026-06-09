@@ -15,7 +15,7 @@ def test_developer_and_user_doc_entrypoints_are_split() -> None:
     assert (REPO_ROOT / "Docs" / "Developer").is_dir()
     assert (REPO_ROOT / "Docs" / "User").is_dir()
     assert (REPO_ROOT / "Docs" / "Developer" / "mcp_tools").is_dir()
-    assert (REPO_ROOT / "Docs" / "User" / "mcp_clients.md").is_file()
+    assert (REPO_ROOT / "Docs" / "User" / "MCP_Clients.md").is_file()
 
 
 def test_requirements_distinguish_legacy_prototype_from_target() -> None:
@@ -56,4 +56,4 @@ def test_development_plan_marks_current_plan_as_legacy_prototype() -> None:
     plan = read_doc("Docs/Development_Plan.md")
 
     assert "legacy prototype" in plan
-    assert "Docs/dev/Feature_Completion_Plan.md" in plan
+    assert "开发文档目录" in plan

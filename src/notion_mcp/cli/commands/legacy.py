@@ -22,10 +22,22 @@ from notion_mcp.config import get_config_path, load_config, set_token, set_user
 # register(app)
 # --------------------------------
 def register(app: typer.Typer) -> None:
-    app.command(name="set-token")(set_token_command)
-    app.command(name="set-user")(set_user_command)
-    app.command(name="show")(show_command)
-    app.command(name="run")(run_command)
+    app.command(
+        name="set-token",
+        help="Set the legacy global Notion token",
+    )(set_token_command)
+    app.command(
+        name="set-user",
+        help="Set the legacy global Notion user id",
+    )(set_user_command)
+    app.command(
+        name="show",
+        help="Show legacy global configuration",
+    )(show_command)
+    app.command(
+        name="run",
+        help="Run the legacy FastAPI REST server",
+    )(run_command)
 
 
 # --------------------------------
@@ -37,10 +49,10 @@ def register(app: typer.Typer) -> None:
 # notion-mcp set-token --token secret
 # --------------------------------
 def set_token_command(
-    token: str = typer.Option(..., "--token", prompt="请输入新的 Notion token", hide_input=True),
+    token: str = typer.Option(..., "--token", prompt="Enter the new Notion token", hide_input=True),
 ) -> None:
     set_token(token)
-    typer.echo("Notion token 已更新")
+    typer.echo("Notion token updated")
 
 
 # --------------------------------
@@ -52,10 +64,10 @@ def set_token_command(
 # notion-mcp set-user --user uuid
 # --------------------------------
 def set_user_command(
-    user: str = typer.Option(..., "--user", prompt="请输入新的用户 UUID"),
+    user: str = typer.Option(..., "--user", prompt="Enter the new user UUID"),
 ) -> None:
     set_user(user)
-    typer.echo("用户 ID 已更新")
+    typer.echo("User ID updated")
 
 
 # --------------------------------
@@ -70,10 +82,10 @@ def show_command() -> None:
     try:
         cfg = load_config()
     except FileNotFoundError:
-        typer.echo("尚未初始化配置，请运行 notion-mcp init")
+        typer.echo("Global configuration is not set. Run: notion-mcp config --global user.token <token>")
         raise typer.Exit(code=1)
-    typer.echo(f"当前配置文件: {get_config_path()}")
-    typer.echo(f"Notion token: {cfg.notion_token}\n用户 UUID: {cfg.user_id}")
+    typer.echo(f"Current configuration file: {get_config_path()}")
+    typer.echo(f"Notion token: {cfg.notion_token}\nUser UUID: {cfg.user_id}")
 
 
 # --------------------------------
@@ -85,9 +97,9 @@ def show_command() -> None:
 # notion-mcp run --host 127.0.0.1 --port 8000
 # --------------------------------
 def run_command(
-    host: str = typer.Option("127.0.0.1", "--host", help="监听地址"),
-    port: int = typer.Option(8000, "--port", help="监听端口"),
-    reload: bool = typer.Option(False, "--reload", help="启用自动重载"),
+    host: str = typer.Option("127.0.0.1", "--host", help="Bind address"),
+    port: int = typer.Option(8000, "--port", help="Bind port"),
+    reload: bool = typer.Option(False, "--reload", help="Enable auto-reload"),
 ) -> None:
     try:
         import uvicorn

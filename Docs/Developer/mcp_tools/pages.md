@@ -2,10 +2,10 @@
 
 - `page_retrieve`
   - 说明：读取页面。
-  - 必选参数：`page_id`。
+  - 必选参数：`page_id`，可传 raw id 或 Notion URL。
 - `page_property_retrieve`
   - 说明：读取页面属性项，支持分页。
-  - 必选参数：`page_id`、`property_id`。
+  - 必选参数：`page_id`、`property_id`。`page_id` 可传 raw id 或 Notion URL。
   - 可选参数：`page_size`、`start_cursor`。
 - `page_create`
   - 说明：按 raw Notion SDK payload 创建页面。
@@ -13,10 +13,10 @@
   - 可选参数：`dry_run`。
 - `page_update`
   - 说明：更新页面。
-  - 必选参数：`page_id`、`payload`。
+  - 必选参数：`page_id`、`payload`。`page_id` 可传 raw id 或 Notion URL。
   - 可选参数：`dry_run`。
 - `page_trash`
   - 说明：将页面移入 trash。
-  - 必选参数：`page_id`、`confirm`。
+  - 必选参数：`page_id`、`confirm`。`page_id` 可传 raw id 或 Notion URL。
   - 可选参数：`dry_run`。
   - 危险性：`destructiveHint=true`，缺少 `confirm=true` 会返回 `confirmation_required`。

@@ -1,5 +1,6 @@
 """
-路由包。按功能拆分的 API 路由在此集中导入，供主应用注册。
+Route package. Domain-specific API routes are imported here for registration by
+the main application.
 """
 
 from . import databases, pages, blocks  # noqa: F401

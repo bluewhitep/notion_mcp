@@ -1,57 +1,33 @@
 # Core 测试文档
 
-本文档面向开发者，记录 Stage 2 Core 层的测试目标和验证命令。
+本文档面向开发者，说明 Core 层测试覆盖目标和常用验证方式。详细历史记录保存在开发进度资料中。
 
-## 测试文件
+## 覆盖目标
 
-- `tests/v2/core/test_config.py`
-  - 验证配置初始化、读取、更新、路径覆盖、`0600` 权限、token 脱敏、UUID 校验和默认 Notion API version。
-- `tests/v2/core/test_errors.py`
-  - 验证 Core 错误结构和错误 code。
-- `tests/v2/core/test_client.py`
-  - 验证 Notion SDK client factory 注入 token、version、timeout、retry，并支持 fake client。
-- `tests/v2/core/test_auth.py`
-  - 验证 `users.me()` token 校验、配置用户 UUID 匹配和错误包装。
-- `tests/v2/core/test_services_and_raw_api.py`
-  - 验证 pages/blocks service 包装、2026 block append `position` 参数、service 不导入 CLI/MCP、raw API 登记表。
-- `tests/v2/core/test_audit.py`
-  - 验证 JSONL 审计记录和敏感字段清理。
+- 配置模型：验证初始化、读取、更新、路径覆盖、文件权限、token 脱敏、UUID 校验和默认 Notion API version。
+- 错误模型：验证 Core error code、message、details 和 CLI/MCP 可消费结构。
+- Client factory：验证 Notion SDK client 初始化时注入 token、version、timeout、retry，并支持 fake client。
+- Auth：验证 `users.me()` token 校验、configured user id 匹配和错误包装。
+- Services：验证 pages、blocks、databases、data sources、users、comments、views、file uploads、search、custom emojis 和 raw API service 行为。
+- Audit：验证 JSONL 审计记录和敏感字段清理。
+- Boundary：验证 Core 不依赖 CLI、MCP server 或 legacy REST routes。
 
-## 验证命令
+## 常用验证命令
 
-Stage 2 focused tests：
+Core focused 验证：
 
 ```bash
-env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/tmp/uvcache_stage2 uv run --no-project --with pytest --with 'pydantic>=2.0' --with notion-client pytest -q -p no:cacheprovider tests/v2/core
+env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_core uv run pytest -q -p no:cacheprovider
 ```
 
-当前结果：
-
-```text
-21 passed
-```
-
-全量当前测试：
+全量本地验证：
 
 ```bash
-env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_full_stage2b uv run --no-project --with fastapi --with 'uvicorn[standard]' --with typer --with 'pydantic>=2.0' --with notion-client --with pytest --with pytest-asyncio --with httpx pytest -q -p no:cacheprovider
+env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_full uv run pytest -q -p no:cacheprovider
 ```
 
-当前结果：
+## 备注
 
-```text
-43 passed, 1 warning
-```
-
-警告来自外部 FastAPI/TestClient 依赖，不是当前 Core 实现失败。
-
-## 测试包 marker
-
-已新增以下 package marker：
-
-- `tests/__init__.py`
-- `tests/v2/__init__.py`
-- `tests/v2/core/__init__.py`
-- `tests/v2/scenarios/__init__.py`
-
-原因：legacy `tests/test_config.py` 与 v2 `tests/v2/core/test_config.py` 同名。全量 pytest 收集时会发生 import mismatch。marker 只用于让 pytest 以分层模块名导入测试，不修改任何既有测试断言。
+- Core 是 CLI 和 MCP Tool 的共同业务层。
+- 新增 Notion API 能力时，应优先在 Core 层补齐测试，再同步 CLI/MCP 入口。
+- 真实 Notion live 测试默认跳过，不能伪造通过。

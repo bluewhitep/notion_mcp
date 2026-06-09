@@ -1,8 +1,7 @@
 """
-页面相关路由。
+Page-related routes.
 
-提供页面的读取、创建和更新功能。根据 Notion API，可通过 `pages.retrieve`、
-`pages.create` 和 `pages.update` 进行操作。
+Provides page retrieval, creation, and update operations.
 """
 
 from __future__ import annotations
@@ -30,7 +29,7 @@ async def get_page(
     page_id: str,
     client: NotionClient = Depends(get_notion_client),
 ) -> Dict[str, Any]:
-    """获取页面详情。"""
+    """Retrieve page details."""
     try:
         result = client.pages.retrieve(page_id=page_id)
         return cast(Dict[str, Any], result)
@@ -43,9 +42,9 @@ async def create_page(
     body: Dict[str, Any] = Body(...),
     client: NotionClient = Depends(get_notion_client),
 ) -> Dict[str, Any]:
-    """创建新的页面。
+    """Create a new page.
 
-    请求体示例：
+    Example body:
 
     ```json
     {
@@ -68,7 +67,7 @@ async def update_page(
     body: Dict[str, Any] = Body(...),
     client: NotionClient = Depends(get_notion_client),
 ) -> Dict[str, Any]:
-    """更新页面属性。"""
+    """Update page properties."""
     try:
         result = client.pages.update(page_id=page_id, **body)
         return cast(Dict[str, Any], result)

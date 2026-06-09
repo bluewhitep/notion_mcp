@@ -1,5 +1,6 @@
 from notion_mcp.core.services.comments import CommentsService
 from notion_mcp.core.services.custom_emojis import CustomEmojisService
+from notion_mcp.core.errors import NotionOperationError
 from notion_mcp.core.services.file_uploads import FileUploadsService
 from notion_mcp.core.services.pages import PagesService
 from notion_mcp.core.services.users import UsersService
@@ -46,6 +47,40 @@ class FakeClient:
         self.views = Recorder("views")
         self.file_uploads = Recorder("file_uploads")
         self.custom_emojis = Recorder("custom_emojis")
+
+
+class ViewsWithoutQuery:
+    def __init__(self) -> None:
+        self.queries = Recorder("views.queries")
+
+
+class FakeClientWithViewQueries:
+    def __init__(self) -> None:
+        self.views = ViewsWithoutQuery()
+
+
+class CustomEmojisWithoutRetrieve:
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, dict[str, object]]] = []
+
+    def list(self, **kwargs: object) -> dict[str, object]:
+        self.calls.append(("list", kwargs))
+        if "start_cursor" not in kwargs:
+            return {
+                "results": [{"id": "emoji-1", "name": "one", "url": "https://example.com/1.png"}],
+                "has_more": True,
+                "next_cursor": "cursor-1",
+            }
+        return {
+            "results": [{"id": "emoji-2", "name": "two", "url": "https://example.com/2.png"}],
+            "has_more": False,
+            "next_cursor": None,
+        }
+
+
+class FakeClientWithListOnlyCustomEmojis:
+    def __init__(self) -> None:
+        self.custom_emojis = CustomEmojisWithoutRetrieve()
 
 
 def test_page_property_retrieve_passes_pagination() -> None:
@@ -106,6 +141,17 @@ def test_views_create_update_query() -> None:
     assert client.views.calls[2] == ("query", {"view_id": "view-1", "page_size": 10})
 
 
+def test_views_query_uses_queries_create_when_sdk_has_no_query_method() -> None:
+    client = FakeClientWithViewQueries()
+
+    ViewsService(client).query("view-1", {"page_size": 10})
+
+    assert client.views.queries.calls[-1] == (
+        "create",
+        {"view_id": "view-1", "page_size": 10},
+    )
+
+
 def test_file_upload_list_and_custom_emoji_retrieve() -> None:
     client = FakeClient()
 
@@ -117,3 +163,26 @@ def test_file_upload_list_and_custom_emoji_retrieve() -> None:
         {"page_size": 5, "start_cursor": "cursor-1"},
     )
     assert client.custom_emojis.calls[-1] == ("retrieve", {"custom_emoji_id": "emoji-1"})
+
+
+def test_custom_emoji_retrieve_falls_back_to_list_lookup() -> None:
+    client = FakeClientWithListOnlyCustomEmojis()
+
+    result = CustomEmojisService(client).retrieve("emoji-2")
+
+    assert result["name"] == "two"
+    assert client.custom_emojis.calls == [
+        ("list", {"page_size": 100}),
+        ("list", {"page_size": 100, "start_cursor": "cursor-1"}),
+    ]
+
+
+def test_custom_emoji_retrieve_list_lookup_raises_when_missing() -> None:
+    client = FakeClientWithListOnlyCustomEmojis()
+
+    try:
+        CustomEmojisService(client).retrieve("missing")
+    except NotionOperationError as exc:
+        assert exc.details["operation"] == "custom_emojis.retrieve"
+    else:
+        raise AssertionError("expected NotionOperationError")

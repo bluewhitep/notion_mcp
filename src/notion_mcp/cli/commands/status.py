@@ -8,6 +8,8 @@
 
 from __future__ import annotations
 
+import os
+
 import typer
 
 from notion_mcp.core.config import load_core_config, redacted_config
@@ -25,7 +27,11 @@ from ..formatting import echo_json
 # register(app)
 # --------------------------------
 def register(app: typer.Typer) -> None:
-    app.command(name="status")(status_command)
+    app.command(
+        name="status",
+        help="Show global configuration and capability status",
+        hidden=True,
+    )(status_command)
 
 
 # --------------------------------
@@ -44,13 +50,14 @@ def build_status() -> dict[str, object]:
     except ConfigNotFoundError:
         configured = False
         public_config = {}
+    explicit_config_path = bool(os.getenv("NOTION_MCP_CONFIG"))
     return {
         "configured": configured,
         "config": public_config,
         "capabilities": {
             "core": True,
             "legacy_rest": True,
-            "mcp_server": not configured,
+            "mcp_server": not (configured and explicit_config_path),
         },
     }
 
@@ -61,7 +68,7 @@ def build_status() -> dict[str, object]:
 # Inputs/Outputs:
 # Optional JSON flag; output is human text or JSON.
 # Usage:
-# notion-mcp status --json
+# hidden compatibility status --json
 # --------------------------------
 def status_command(
     json_output: bool = typer.Option(False, "--json", help="Print JSON output"),

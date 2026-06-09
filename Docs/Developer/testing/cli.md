@@ -1,58 +1,43 @@
 # CLI 测试文档
 
-本文档面向开发者，记录 Stage 3 CLI 测试目标和验证命令。
+本文档面向开发者，说明 CLI 测试覆盖目标和常用验证方式。详细历史记录保存在开发进度资料中。
 
-## 测试文件
+## 覆盖目标
 
-- `tests/v2/cli/test_init.py`
-  - 验证 `notion-mcp init` 非交互模式、Core 配置写入、token 脱敏、用户 UUID 校验和文件权限。
-- `tests/v2/cli/test_config_commands.py`
-  - 验证 `config get/set/unset/list` 和 token 默认脱敏。
-- `tests/v2/cli/test_status.py`
-  - 验证普通状态输出和 `--json` 稳定结构。
-- `tests/v2/cli/test_resource_commands.py`
-  - 验证 page、block、database 命令通过 Core service mock 调用。
-  - 验证 CLI 命令模块不导入 Notion SDK。
-- `tests/v2/cli/test_dry_run.py`
-  - 验证 page create dry-run 不调用写操作。
-  - 验证 `notion-mcp mcp serve --help` 可用。
-- `tests/v2/cli/test_stage8_extended_resource_commands.py`
-  - 验证 data-source、user、comment、view、file-upload、search、custom-emoji、raw-api 命令组注册。
-  - 验证新增资源命令通过 Core service mock 调用。
-  - 验证扩展 CLI 命令模块不导入 Notion SDK。
+- Root command：验证 `init`、`pwd`、`version`、legacy compatibility commands 和帮助文本。
+- Config commands：验证 `config --global` 管理全局配置，`config --local --show` 读取项目级配置，token 默认脱敏。
+- Project context：验证项目级 `.notion_mcp/` 初始化、状态读取、root 解析和隐藏兼容入口。
+- Page commands：验证 page attach/status/refresh/detach/retrieve/blocks/create/update，以及 hidden compatibility aliases。
+- Block commands：验证 block append/insert-after/update/trash 和底层 children 读取。
+- Database/DataSource commands：验证 database 容器命令、data-source 表级命令、database 快捷命令和 attached active data source 默认解析。
+- Raw API：验证 registered operation 仍可调用，并且 Raw API 只作为高级兜底入口。
+- Output contract：验证 CLI prompt/output、HTTP error detail 和 schema description 使用英文；`--json` 输出结构保持稳定。
+- Boundary contract：验证 CLI 命令调用 Core service，不直接导入 Notion SDK。
 
-## 验证命令
+## 常用验证命令
 
-Stage 3 focused tests：
+Focused CLI 验证：
 
 ```bash
-env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/tmp/uvcache_stage3 uv run --no-project --with pytest --with typer --with 'pydantic>=2.0' --with notion-client pytest -q -p no:cacheprovider tests/v2/cli
+env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_cli_docs uv run pytest -q -p no:cacheprovider
 ```
 
-当前结果：
-
-```text
-23 passed
-```
-
-全量当前测试：
+文档清单和用户文档边界验证：
 
 ```bash
-env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_full_stage3 uv run --no-project --with fastapi --with 'uvicorn[standard]' --with typer --with 'pydantic>=2.0' --with notion-client --with pytest --with pytest-asyncio --with httpx pytest -q -p no:cacheprovider
-```
-
-当前结果：
-
-```text
-55 passed, 1 warning
+env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_docs uv run pytest -q -p no:cacheprovider
 ```
 
 隔离安装验收：
 
 ```bash
-env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_stage3_help uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp --help
-env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_stage3_status uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp status --json
-env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_stage3_mcp_help uv run --no-project --with /Users/mbp-14/Desktop/notion_mcp_project notion-mcp mcp serve --help
+env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_install uv run --no-project --with . notion-mcp --help
+env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_install uv run --no-project --with . notion-mcp config --global --show --json
+env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_install uv run --no-project --with . notion-mcp mcp serve --help
 ```
 
-当前结果：三条命令均通过。
+## 备注
+
+- 真实 Notion workspace 验证必须显式启用，并使用安全的测试 page/database。
+- 如果新增 CLI 行为影响用户手册，必须同步更新 `Docs/User/Cli.md`。
+- 如果新增命令涉及配置、token、attach state 或 Notion permission，必须同步更新 `Docs/User/Configuration.md`。

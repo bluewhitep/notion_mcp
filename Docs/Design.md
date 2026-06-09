@@ -88,8 +88,8 @@ Core 不导入 CLI、MCP server 或 legacy REST routes。
 CLI 只做终端用户体验：
 
 - `notion-mcp init`
-- `notion-mcp config get/set/unset/list`
-- `notion-mcp status --json`
+- `notion-mcp config --global --show`
+- `notion-mcp config --local --show`
 - `notion-mcp auth validate`
 - `notion-mcp page ...`
 - `notion-mcp database ...`
@@ -160,9 +160,9 @@ Core 集中管理 Notion API version。
 
 ## 测试策略
 
-- legacy 测试：保持不修改。
-- v2 core 测试：验证 Core 业务逻辑。
-- v2 CLI 测试：验证 CLI 到 Core。
-- v2 MCP 测试：验证 MCP Tool 到 Core。
-- v2 scenarios：验证隔离安装、端到端 mock 工作流。
-- live 测试：真实 Notion 环境，默认跳过。
+- legacy 测试：保持不修改，用于保护旧 FastAPI REST 和旧 CLI 行为。
+- Core 测试：验证 Core 业务逻辑、配置、client factory、service 和错误模型。
+- CLI 测试：验证 CLI 到 Core 的调用边界、human output、JSON output 和 dry-run。
+- MCP 测试：验证 MCP server 生命周期、tool inventory、tool call 和危险操作确认。
+- 场景测试：验证隔离安装、端到端 mock workflow 和项目上下文解析。
+- live 测试：访问真实 Notion 环境，默认跳过。

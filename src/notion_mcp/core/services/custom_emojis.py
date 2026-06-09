@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Any
 
 from .base import BaseNotionService
+from ..errors import NotionOperationError
 
 
 class CustomEmojisService(BaseNotionService):
@@ -34,8 +35,26 @@ class CustomEmojisService(BaseNotionService):
     # CustomEmojisService(client).retrieve("emoji-id")
     # --------------------------------
     def retrieve(self, custom_emoji_id: str) -> dict[str, Any]:
-        return self._call(
-            "custom_emojis.retrieve",
-            self.client.custom_emojis.retrieve,
-            custom_emoji_id=custom_emoji_id,
-        )
+        retrieve = getattr(self.client.custom_emojis, "retrieve", None)
+        if callable(retrieve):
+            return self._call(
+                "custom_emojis.retrieve",
+                retrieve,
+                custom_emoji_id=custom_emoji_id,
+            )
+
+        cursor: str | None = None
+        while True:
+            params: dict[str, Any] = {"page_size": 100}
+            if cursor:
+                params["start_cursor"] = cursor
+            payload = self.list(**params)
+            for emoji in payload.get("results", []):
+                if emoji.get("id") == custom_emoji_id:
+                    return emoji
+            if not payload.get("has_more"):
+                break
+            cursor = payload.get("next_cursor")
+            if not cursor:
+                break
+        raise NotionOperationError("custom_emojis.retrieve", "Custom emoji not found")

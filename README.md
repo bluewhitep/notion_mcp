@@ -9,4 +9,4 @@ Current state:
 - MCP tools are the structured Agent/LLM entrypoint.
 - Legacy FastAPI REST routes are retained only for compatibility.
 
-Use `Docs/User/installation.md` and `Docs/User/mcp_clients.md` for setup and client configuration.
+Use `Docs/User/Installation.md` and `Docs/User/MCP_Clients.md` for setup and client configuration.

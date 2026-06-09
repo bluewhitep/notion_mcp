@@ -23,14 +23,22 @@ from .commands import (
     legacy,
     mcp,
     pages,
+    project,
     raw_api,
     search,
     status,
     users,
+    version,
     views,
 )
 
-app = typer.Typer(add_completion=False, help="Local Notion MCP developer tool")
+app = typer.Typer(
+    add_completion=False,
+    help=(
+        "Local Notion MCP CLI. Show global configuration and capability "
+        "status with config --global --show."
+    ),
+)
 
 
 # --------------------------------
@@ -44,6 +52,8 @@ app = typer.Typer(add_completion=False, help="Local Notion MCP developer tool")
 def register_commands() -> None:
     init.register(app)
     status.register(app)
+    project.register(app)
+    version.register(app)
     config.register(app)
     auth.register(app)
     pages.register(app)

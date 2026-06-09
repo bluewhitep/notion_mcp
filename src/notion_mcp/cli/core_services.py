@@ -67,7 +67,7 @@ def get_blocks_service() -> BlocksService:
 # Inputs/Outputs:
 # No input; returns DatabasesService.
 # Usage:
-# get_databases_service().query("database-id")
+# get_databases_service().retrieve("database-id")
 # --------------------------------
 def get_databases_service() -> DatabasesService:
     return DatabasesService(get_core_client())

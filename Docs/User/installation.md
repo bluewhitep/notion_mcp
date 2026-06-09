@@ -2,25 +2,57 @@
 
 本文面向使用者，说明如何安装本地 Notion MCP 工具。
 
+## 安装策略
+
+推荐优先使用 `uv` 从本地路径安装。`uv tool install` 会把 `notion-mcp`
+命令安装到持久 tool 环境，并把可执行入口暴露到 PATH。
+
+如果本机没有安装 `uv`，可以使用 `pip` 从本地路径安装。
+
+安装完成后，需要先完成 Notion 侧 connection、token、page/database 授权和 id 查询。详细步骤见 [Configuration](Configuration.md) 的 “Notion 侧准备”。
+
+安装后的第一组命令通常是：
+
+```bash
+notion-mcp config --global user.token ntn_xxx
+notion-mcp config --global user.name "Ada"
+notion-mcp config --global --show
+```
+
+如果你在旧文档或旧脚本中看到 `set-token`、`set-user`、`show` 或 `run`，它们是 legacy 兼容命令；说明见 [Configuration](Configuration.md) 的 “Legacy 兼容入口”。
+
+## 使用 uv 安装
+
+推荐安装方式：
+
+```bash
+cd /path/to/notion_mcp_project
+uv tool install .
+notion-mcp --help
+```
+
+如果安装后终端找不到 `notion-mcp`，先确认 uv tool executable directory 已经在 PATH 中：
+
+```bash
+uv tool update-shell
+```
+
+然后重新打开终端再运行：
+
+```bash
+notion-mcp --help
+```
+
 ## 使用 uv 临时运行
 
-在仓库根目录外也可以使用：
+不想持久安装时，可以从本地路径临时运行：
 
 ```bash
-uv run --no-project --with /path/to/notion_mcp_project notion-mcp --help
+cd /path/to/notion_mcp_project
+uv run --no-project --with . notion-mcp --help
 ```
 
-## 使用 uvx 风格运行
-
-如果已经发布到包索引，可使用：
-
-```bash
-uvx notion-mcp --help
-```
-
-当前本地开发仓库建议使用本地路径安装。
-
-## 使用 pip 安装
+## 无 uv 时使用 pip 安装
 
 ```bash
 pip install /path/to/notion_mcp_project
@@ -29,8 +61,16 @@ notion-mcp --help
 
 ## 卸载
 
+使用 `uv tool install` 安装时：
+
+```bash
+uv tool uninstall notion-mcp
+```
+
+使用 `pip install` 安装时：
+
 ```bash
 pip uninstall notion-mcp
 ```
 
-如果使用 `uv run --with /path/to/project` 临时运行，不需要单独卸载。
+如果使用 `uv run --no-project --with .` 临时运行，不需要单独卸载。

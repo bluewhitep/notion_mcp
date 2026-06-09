@@ -20,11 +20,11 @@ Notion API 是 versioned API，Core 层必须集中管理 `Notion-Version`。当
   - 页面获取、创建、更新。
   - 区块子元素列表、追加、更新。
 - mock 单元测试覆盖 legacy 配置、CLI 和 REST 路由。
-- 阶段 0 已迁移到 `src/notion_mcp/` 可安装布局，并修复隔离安装入口。
+- 仓库已迁移到 `src/notion_mcp/` 可安装布局，并修复隔离安装入口。
 
 以上能力只能证明当前 FastAPI REST 原型可运行，不代表最终 MCP 服务器完成。
 
-## 待实现目标能力（阶段 8 已实现）
+## 待实现目标能力（当前已实现）
 
 最终目标是：
 
@@ -62,12 +62,24 @@ Agent / LLM -> MCP Tool -> Core
   - custom emojis
   - 受控 raw/pass-through 操作入口
 
-阶段 8 发布前验收已经通过；具体命令和结果见 `Docs/dev/progress.md`。
+发布前验收已经通过；详细执行命令和结果保存在开发进度文档中。
+
+## 当前产品层目标
+
+当前产品层目标：
+
+- 引入 Git-like 本地目录上下文：全局配置继续保存 token、用户和运行参数；项目级 `.notion_mcp/config.json` 只保存项目上下文，不保存 token。
+- 支持 page/database attach state：`.notion_mcp/state/page.attach.json` 和 `.notion_mcp/state/database.attach.json`。
+- 普通用户围绕 `page` CLI 读取和编辑当前页面内容；`block` CLI 保留为高级/底层入口。
+- 严格区分 `database` 和 `data_source`：`database` 是容器对象，`data_source` 是 database 下的具体表。
+- 用户 CLI 可保留 `database` 心智，但必须暴露 `data-source` 命名空间，并在多 data source 场景要求显式选择。
+- Raw API 保留为兜底和高级入口，不作为普通 page/database 编辑的常用路径。
+- Notion-Version 由全局配置集中管理，默认 pinned，不在 Core、CLI 或 MCP tool 模块中硬编码。
 
 ## 非功能需求
 
 - 所有功能先写测试，再写实现。
-- 已有测试不能为了通过而修改；只能新增 `v2`、`v3` 或更明确命名的补充测试，并在 `Docs/dev/progress.md` 记录原因。
+- 已有测试不能为了通过而修改；覆盖不足时新增更明确的补充测试，并在开发进度文档中记录原因。
 - 开发者文档和使用者文档必须分离。
 - 不允许超大文本文件。
 - 源码和测试必须按功能、目的和层次拆分。
@@ -77,9 +89,7 @@ Agent / LLM -> MCP Tool -> Core
 
 ## 文档边界
 
-- `Docs/dev/Feature_Completion_Plan.md`：完整补全开发计划。
-- `Docs/dev/progress.md`：阶段推进记录和验证结果。
-- `Docs/dev/test_policy.md`：测试先行和不可修改既有测试规则。
+- 开发计划、架构决议和测试策略记录在开发文档目录中。
 - `Docs/Developer/`：开发者对象文档，包含架构、Core API、MCP tools、测试策略和 packaging。
 - `Docs/User/`：使用者对象文档，包含安装、配置、CLI、MCP client 和排障。
 

@@ -2,7 +2,7 @@
 # Format: UTF-8
 # =============================
 # File Description:
-# Core service for legacy Notion database operations.
+# Core service for Notion database container operations.
 # TAG: core, services, databases
 # =============================
 
@@ -28,6 +28,21 @@ class DatabasesService(BaseNotionService):
             self.client.databases.retrieve,
             database_id=database_id,
         )
+
+    # --------------------------------
+    # Function Description:
+    # Lists child data sources from a Notion database container response.
+    # Inputs/Outputs:
+    # Input database_id; returns the database response data_sources list.
+    # Usage:
+    # DatabasesService(client).list_data_sources("database-id")
+    # --------------------------------
+    def list_data_sources(self, database_id: str) -> list[dict[str, Any]]:
+        database = self.retrieve(database_id)
+        data_sources = database.get("data_sources", [])
+        if not isinstance(data_sources, list):
+            return []
+        return [item for item in data_sources if isinstance(item, dict)]
 
     # --------------------------------
     # Function Description:
@@ -58,16 +73,23 @@ class DatabasesService(BaseNotionService):
 
     # --------------------------------
     # Function Description:
-    # Queries a legacy Notion database.
+    # Renames a Notion database container.
     # Inputs/Outputs:
-    # Input database_id and query payload; returns Notion query response.
+    # Input database_id and new display name; returns Notion update response.
     # Usage:
-    # DatabasesService(client).query("database-id", {"page_size": 10})
+    # DatabasesService(client).rename("database-id", "Project Database")
     # --------------------------------
-    def query(self, database_id: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
-        return self._call(
-            "databases.query",
-            self.client.databases.query,
-            database_id=database_id,
-            **(payload or {}),
-        )
+    def rename(self, database_id: str, new_name: str) -> dict[str, Any]:
+        return self.update(database_id, {"title": rich_text_title(new_name)})
+
+
+# --------------------------------
+# Function Description:
+# Builds a Notion rich text title payload from plain text.
+# Inputs/Outputs:
+# Input display text; returns title rich text list.
+# Usage:
+# rich_text_title("Project Database")
+# --------------------------------
+def rich_text_title(text: str) -> list[dict[str, Any]]:
+    return [{"type": "text", "text": {"content": text}}]

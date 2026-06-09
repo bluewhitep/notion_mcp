@@ -1,7 +1,8 @@
 """
-FastAPI 依赖定义。
+FastAPI dependency definitions.
 
-为了避免循环导入，将获取配置和初始化 Notion 客户端的依赖函数独立放在此模块。
+This module keeps configuration loading and Notion client initialization
+separate to avoid circular imports.
 """
 
 from __future__ import annotations
@@ -19,19 +20,25 @@ except ImportError:
 
 
 def get_config() -> Config:
-    """读取并返回当前配置。
+    """Load and return the current configuration.
 
-    如果配置文件不存在或 token 未设置，则抛出 HTTP 500 异常，提示用户先初始化配置。
+    Raises HTTP 500 when the configuration file or Notion token is missing.
     """
     try:
         config = load_config()
     except FileNotFoundError:
-        raise HTTPException(status_code=500, detail="配置文件不存在，请先运行 notion-mcp init")
+        raise HTTPException(
+            status_code=500,
+            detail="Global configuration file does not exist. Run: notion-mcp config --global user.token <token>",
+        )
     if not config.notion_token:
-        raise HTTPException(status_code=500, detail="未设置 Notion token，请运行 notion-mcp set-token")
+        raise HTTPException(
+            status_code=500,
+            detail="Notion token is not set. Run: notion-mcp config --global user.token <token>",
+        )
     return config
 
 
 def get_notion_client(config: Config = Depends(get_config)) -> NotionClient:
-    """根据配置初始化并返回 Notion 客户端。"""
+    """Initialize and return a Notion client from configuration."""
     return NotionClient(auth=config.notion_token)  # type: ignore

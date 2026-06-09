@@ -6,8 +6,8 @@
 
 当前可用入口包括 git-like CLI、本地 MCP server 和 legacy FastAPI REST 兼容入口。
 
-CLI 使用说明见 `Docs/User/cli.md`。
-MCP client 使用说明见 `Docs/User/mcp_clients.md`。
+CLI 使用说明见 [Cli](Cli.md)。
+MCP client 使用说明见 [MCP Clients](MCP_Clients.md)。
 
 ## 前提条件
 
@@ -17,31 +17,32 @@ MCP client 使用说明见 `Docs/User/mcp_clients.md`。
 
 ## 安装
 
-推荐使用 uv 隔离运行：
+推荐使用 uv 从仓库根目录安装：
 
 ```bash
-uv run --with /path/to/notion_mcp_project notion-mcp --help
+cd /path/to/notion_mcp_project
+uv tool install .
+notion-mcp --help
 ```
 
-更完整的安装说明见 `Docs/User/installation.md`。
+如果本机没有安装 `uv`，可以使用 `pip` 从本地路径安装。
+
+更完整的安装说明见 [Installation](Installation.md)。
 
 ## 初始化配置
 
-首次使用需设置 Notion 集成 token 和当前用户 UUID。
+首次使用需设置全局 Notion token。普通用户不需要手动填写 `user_id`。
 
 ```bash
-# 运行初始化命令，按照提示输入 token、用户名和用户 UUID
-notion-mcp init
+# 设置全局 token 和可选用户名
+notion-mcp config --global user.token ntn_xxx
+notion-mcp config --global user.name Ada
 
-# 或直接通过参数指定，跳过交互
-notion-mcp init --token ntn_xxx --user-name Ada --user-id 01234567-89ab-cdef-0123-456789abcdef
+# 查看保存的配置和 token 状态
+notion-mcp config --global --show --json
 
-# 查看保存的配置
-notion-mcp status --json
-
-# 更新 token 或用户 ID
-notion-mcp config set notion_token 新的token
-notion-mcp config set user_id 新的用户UUID
+# 查看当前 token 对应的 Notion identity
+notion-mcp auth whoami --json
 ```
 
 配置文件默认存储在 `~/.notion_mcp/config.json`。可以通过环境变量 `NOTION_MCP_CONFIG` 指定其他路径。
@@ -54,7 +55,7 @@ notion-mcp config set user_id 新的用户UUID
 notion-mcp mcp serve --transport stdio
 ```
 
-MCP client 配置说明见 `Docs/User/mcp_clients.md`。
+MCP client 配置说明见 [MCP Clients](MCP_Clients.md)。
 
 ## 调用示例
 
@@ -62,7 +63,7 @@ CLI 示例：
 
 ```bash
 notion-mcp page retrieve <page_id> --json
-notion-mcp database query <database_id> --json
+notion-mcp data-source query <data_source_id> --json
 notion-mcp block children <block_id> --json
 ```
 
@@ -70,15 +71,19 @@ notion-mcp block children <block_id> --json
 
 ### 1. 为什么提示“未设置 Notion token”？
 
-这是因为在调用接口前未运行 `notion-mcp init` 或未设置 token。请按照初始化步骤设置 token。
+这是因为在调用接口前还没有设置全局 token。请运行：
 
-### 2. 如何找到我的 Notion 用户 UUID？
+```bash
+notion-mcp config --global user.token ntn_xxx
+```
 
-你可以访问 `https://api.notion.com/v1/users/me` 并在响应中查找 `id` 字段，也可以通过 Notion 后台的个人信息界面获取。该 UUID 用于标识编辑者。
+### 2. 是否需要填写 Notion 用户 UUID？
+
+普通用户不需要手动填写。需要排查当前 token 身份时，运行 `notion-mcp auth whoami --json` 查看返回的 `user_id`。
 
 ### 3. 是否支持 OAuth 授权？
 
-当前版本仅支持内部集成 token。如需 OAuth 支持，可以在项目开发计划中提出需求；未来版本可能会支持。
+当前版本仅支持内部集成 token。OAuth 支持不在当前用户流程中。
 
 ### 4. 调用返回错误怎么办？
 
@@ -92,4 +97,4 @@ notion-mcp block children <block_id> --json
 
 ---
 
-本指南介绍了从安装到使用本地 Notion MCP 服务的完整流程。更多开发者接口说明请参阅 `Docs/Developer/API.md`。
+本指南介绍了从安装到使用本地 Notion MCP 服务的完整流程。
