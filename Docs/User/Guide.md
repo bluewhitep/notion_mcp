@@ -28,6 +28,7 @@ notion-mcp --help
 如果本机没有安装 `uv`，可以使用 `pip` 从本地路径安装。
 
 更完整的安装说明见 [Installation](Installation.md)。
+卸载和清理说明见 [Uninstallation](Uninstallation.md)。
 
 ## 初始化配置
 

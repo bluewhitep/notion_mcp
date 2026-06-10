@@ -61,16 +61,20 @@ notion-mcp --help
 
 ## 卸载
 
-使用 `uv tool install` 安装时：
+如果只需要移除命令行工具，按当初的安装方式执行其中一种。
+
+使用 `uv tool install .` 安装时：
 
 ```bash
 uv tool uninstall notion-mcp
 ```
 
-使用 `pip install` 安装时：
+使用 `pip install /path/to/notion_mcp_project` 安装时：
 
 ```bash
 pip uninstall notion-mcp
 ```
 
 如果使用 `uv run --no-project --with .` 临时运行，不需要单独卸载。
+
+如果已经配置过 MCP client、后台 server、本地 token 或项目级 `.notion_mcp/` 上下文，请按 [Uninstallation](Uninstallation.md) 的完整清理顺序处理。

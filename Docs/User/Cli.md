@@ -5,6 +5,7 @@
 ## 先读
 
 - [Installation](Installation.md)：安装 `notion-mcp`。
+- [Uninstallation](Uninstallation.md)：卸载命令行工具、清理 MCP client 配置、本地 token 和项目上下文。
 - [Configuration](Configuration.md)：准备 Notion connection、设置 token、创建项目级上下文。
 - [MCP Clients](MCP_Clients.md)：在 MCP 工具里配置本地 Notion MCP server。
 - [Troubleshooting](Troubleshooting.md)：常见错误和排查入口。

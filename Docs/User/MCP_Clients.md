@@ -177,6 +177,8 @@ notion-mcp server stop
 notion-mcp server remove
 ```
 
+如果要从 MCP client 中移除 `notion-mcp`，或继续卸载本地命令行工具，见 [Uninstallation](Uninstallation.md)。
+
 如果停止失败，可以使用：
 
 ```bash
