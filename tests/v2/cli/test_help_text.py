@@ -22,6 +22,31 @@ def test_root_help_describes_direct_commands() -> None:
     assert "Run the legacy FastAPI REST server" not in result.stdout
 
 
+def test_short_help_option_matches_root_help() -> None:
+    result = runner.invoke(app, ["-h"])
+
+    assert result.exit_code == 0
+    assert "Usage:" in result.stdout
+    assert "--help" in result.stdout
+    assert "-h" in result.stdout
+    assert "init" in result.stdout
+
+
+def test_short_help_option_reaches_subcommands() -> None:
+    server_result = runner.invoke(app, ["server", "run", "-h"])
+    config_result = runner.invoke(app, ["config", "global", "-h"])
+
+    assert server_result.exit_code == 0
+    assert "--help" in server_result.stdout
+    assert "-h" in server_result.stdout
+    assert "--host" in server_result.stdout
+
+    assert config_result.exit_code == 0
+    assert "--help" in config_result.stdout
+    assert "-h" in config_result.stdout
+    assert "Set a global configuration value" in config_result.stdout
+
+
 def test_project_and_config_help_describe_dynamic_subcommands() -> None:
     project_result = runner.invoke(app, ["project", "--help"])
     config_global_result = runner.invoke(app, ["config", "global", "--help"])

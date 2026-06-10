@@ -31,8 +31,11 @@ from .commands import (
     views,
 )
 
+HELP_CONTEXT_SETTINGS = {"help_option_names": ["--help", "-h"]}
+
 app = typer.Typer(
     add_completion=False,
+    context_settings=HELP_CONTEXT_SETTINGS,
     help=(
         "Local Notion MCP CLI. Show global configuration and capability "
         "status with config --global --show."

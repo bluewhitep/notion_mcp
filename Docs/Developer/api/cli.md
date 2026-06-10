@@ -7,6 +7,7 @@
 - package：`notion_mcp.cli`
 - console script：`notion-mcp = notion_mcp.cli:app`
 - root app：`src/notion_mcp/cli/app.py`
+- help options：`--help` and `-h`
 
 ## 核心边界
 

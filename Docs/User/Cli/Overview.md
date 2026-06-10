@@ -4,6 +4,7 @@
 
 ## 通用规则
 
+- 查看帮助时，`-h` 与 `--help` 等价，例如 `notion-mcp -h`、`notion-mcp page -h`。
 - 大多数读取命令支持 `--json`，用于给脚本或 Agent 读取结构化结果。
 - 写入、更新、发送、完成、trash 等有副作用命令优先使用 `--dry-run` 预览请求。
 - JSON 参数通过 `--payload`、`--properties` 或 `--arguments` 传入，内容必须是 JSON object。
