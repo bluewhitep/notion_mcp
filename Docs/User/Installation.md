@@ -2,10 +2,17 @@
 
 本文面向使用者，说明如何安装本地 Notion MCP 工具。
 
-## 安装策略
+本文按场景分层：
 
-推荐优先使用 `uv` 从本地路径安装。`uv tool install` 会把 `notion-mcp`
-命令安装到持久 tool 环境，并把可执行入口暴露到 PATH。
+- 安装：第一次让本机能运行 `notion-mcp`。
+- 更新或重新安装：先更新本地仓库，再重新安装当前包。
+- 卸载：移除本地命令，或跳转到完整清理文档。
+
+每个场景下再按安装方式分层：`uv` 持久安装、`uv` 临时运行、`pip` 安装。
+
+## 使用前准备
+
+推荐优先使用 `uv` 从本地路径安装。`uv tool install` 会把 `notion-mcp` 命令安装到持久 tool 环境，并把可执行入口暴露到 PATH。
 
 如果本机没有安装 `uv`，可以使用 `pip` 从本地路径安装。
 
@@ -21,9 +28,11 @@ notion-mcp config --global --show
 
 新的配置命令统一使用 `notion-mcp config --global ...`。
 
-## 使用 uv 安装
+## 安装
 
-推荐安装方式：
+### uv 持久安装
+
+推荐第一次安装使用这种方式：
 
 ```bash
 cd /path/to/notion_mcp_project
@@ -43,7 +52,7 @@ uv tool update-shell
 notion-mcp --help
 ```
 
-## 使用 uv 临时运行
+### uv 临时运行
 
 不想持久安装时，可以从本地路径临时运行：
 
@@ -52,29 +61,67 @@ cd /path/to/notion_mcp_project
 uv run --no-project --with . notion-mcp --help
 ```
 
-## 无 uv 时使用 pip 安装
+### pip 安装
+
+没有 `uv` 时，可以用 `pip` 从本地路径安装：
 
 ```bash
 pip install /path/to/notion_mcp_project
 notion-mcp --help
 ```
 
+## 更新或重新安装当前包
+
+如果当前仓库代码有更新，步骤是先更新本地仓库，再把本地 `notion-mcp` 命令重新安装为当前包版本。如果 `git pull` 提示本地有未提交改动，先处理本地改动后再继续。
+
+### uv 持久安装
+
+```bash
+cd /path/to/notion_mcp_project
+git pull
+uv tool install --force --reinstall .
+notion-mcp --help
+```
+
+### uv 临时运行
+
+临时运行方式不需要重新安装持久命令。更新仓库后，下一次临时运行会使用当前本地路径：
+
+```bash
+cd /path/to/notion_mcp_project
+git pull
+uv run --no-project --with . notion-mcp --help
+```
+
+### pip 安装
+
+```bash
+cd /path/to/notion_mcp_project
+git pull
+pip install --force-reinstall /path/to/notion_mcp_project
+notion-mcp --help
+```
+
 ## 卸载
 
-如果只需要移除命令行工具，按当初的安装方式执行其中一种。
+如果只需要移除命令行工具，按当初的安装方式执行对应命令。
 
-使用 `uv tool install .` 安装时：
+### uv 持久安装
 
 ```bash
 uv tool uninstall notion-mcp
 ```
 
-使用 `pip install /path/to/notion_mcp_project` 安装时：
+### uv 临时运行
+
+临时运行方式没有持久安装的 `notion-mcp` 命令，不需要单独卸载。
+
+### pip 安装
 
 ```bash
 pip uninstall notion-mcp
 ```
 
-如果使用 `uv run --no-project --with .` 临时运行，不需要单独卸载。
+### 完整清理
 
 如果已经配置过 MCP client、后台 server、本地 token 或项目级 `.notion_mcp/` 上下文，请按 [Uninstallation](Uninstallation.md) 的完整清理顺序处理。

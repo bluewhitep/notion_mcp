@@ -177,13 +177,13 @@ notion-mcp server stop
 notion-mcp server remove
 ```
 
-如果要从 MCP client 中移除 `notion-mcp`，或继续卸载本地命令行工具，见 [Uninstallation](Uninstallation.md)。
-
-如果停止失败，可以使用：
+如果清理时需要强制停止 server，可以使用：
 
 ```bash
-notion-mcp server stop --force
+notion-mcp server remove --force
 ```
+
+这只清理后台 server runtime。若要从 MCP client 中移除 `notion-mcp`，或继续卸载本地命令行工具、本地 token 和项目上下文，见 [Uninstallation](Uninstallation.md)。
 
 ## 环境变量
 
