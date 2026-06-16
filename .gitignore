@@ -1,5 +1,6 @@
 __pycache__/
 .*/
+!.gitignore
 *.py[cod]
 *.pyo
 .pytest_cache/
