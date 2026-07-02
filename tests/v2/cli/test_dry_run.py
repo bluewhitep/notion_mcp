@@ -5,6 +5,8 @@ from typer.testing import CliRunner
 from notion_mcp.cli import app
 from notion_mcp.cli.commands import pages
 
+from .helpers import plain_cli_output
+
 
 runner = CliRunner()
 
@@ -43,8 +45,9 @@ def test_page_create_dry_run_does_not_call_core_write(monkeypatch) -> None:
 
 def test_server_run_help_is_available() -> None:
     result = runner.invoke(app, ["server", "run", "--help"])
+    output = plain_cli_output(result.stdout)
 
     assert result.exit_code == 0
-    assert "run" in result.stdout
-    assert "--host" in result.stdout
-    assert "--port" in result.stdout
+    assert "run" in output
+    assert "--host" in output
+    assert "--port" in output

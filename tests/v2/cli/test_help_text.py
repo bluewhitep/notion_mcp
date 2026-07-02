@@ -2,6 +2,8 @@ from typer.testing import CliRunner
 
 from notion_mcp.cli import app
 
+from .helpers import plain_cli_output
+
 
 runner = CliRunner()
 
@@ -24,27 +26,30 @@ def test_root_help_describes_direct_commands() -> None:
 
 def test_short_help_option_matches_root_help() -> None:
     result = runner.invoke(app, ["-h"])
+    output = plain_cli_output(result.stdout)
 
     assert result.exit_code == 0
-    assert "Usage:" in result.stdout
-    assert "--help" in result.stdout
-    assert "-h" in result.stdout
-    assert "init" in result.stdout
+    assert "Usage:" in output
+    assert "--help" in output
+    assert "-h" in output
+    assert "init" in output
 
 
 def test_short_help_option_reaches_subcommands() -> None:
     server_result = runner.invoke(app, ["server", "run", "-h"])
     config_result = runner.invoke(app, ["config", "global", "-h"])
+    server_output = plain_cli_output(server_result.stdout)
+    config_output = plain_cli_output(config_result.stdout)
 
     assert server_result.exit_code == 0
-    assert "--help" in server_result.stdout
-    assert "-h" in server_result.stdout
-    assert "--host" in server_result.stdout
+    assert "--help" in server_output
+    assert "-h" in server_output
+    assert "--host" in server_output
 
     assert config_result.exit_code == 0
-    assert "--help" in config_result.stdout
-    assert "-h" in config_result.stdout
-    assert "Set a global configuration value" in config_result.stdout
+    assert "--help" in config_output
+    assert "-h" in config_output
+    assert "Set a global configuration value" in config_output
 
 
 def test_project_and_config_help_describe_dynamic_subcommands() -> None:
