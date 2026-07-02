@@ -8,7 +8,8 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 def test_isolated_install_cli_and_mcp_help() -> None:
     commands = [
         ["notion-mcp", "--help"],
-        ["notion-mcp", "mcp", "serve", "--help"],
+        ["notion-mcp", "server", "stdio", "--help"],
+        ["notion-mcp", "server", "run", "--help"],
     ]
 
     for command in commands:

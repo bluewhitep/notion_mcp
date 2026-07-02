@@ -1,0 +1,28 @@
+name: Feature request
+description: Suggest an improvement or new capability.
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What workflow should this improve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the CLI, MCP tool, configuration, or documentation change you want.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Optional. Mention current workarounds or other designs.
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility notes
+      description: Optional. Mention any impact on existing CLI commands, MCP tools, or config files.

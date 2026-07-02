@@ -6,10 +6,21 @@ build-backend = "hatchling.build"
 name = "notion-mcp"
 version = "0.2.0"
 description = "A local Notion MCP server with Core, CLI, and MCP tool entrypoints"
-authors = [ { name = "Your Name", email = "you@example.com" } ]
+authors = [ { name = "Jieqiang Zhang", email = "20318684+bluewhitep@users.noreply.github.com" } ]
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+keywords = ["mcp", "notion", "cli", "model-context-protocol"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 dependencies = [
     "fastapi>=0.110",
     "uvicorn[standard]>=0.29",
@@ -43,12 +54,19 @@ packages = ["src/notion_mcp"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src", "."]
+norecursedirs = ["tests/v5"]
 markers = [
     "live: tests that require real Notion credentials and are skipped by default",
 ]
 
 [project.scripts]
 notion-mcp = "notion_mcp.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/bluewhitep/notion_mcp"
+Repository = "https://github.com/bluewhitep/notion_mcp"
+Issues = "https://github.com/bluewhitep/notion_mcp/issues"
+Documentation = "https://github.com/bluewhitep/notion_mcp/tree/main/Docs"
 
 [tool.ruff]
 line-length = 120
@@ -68,3 +86,32 @@ cache_dir = "/tmp/notion_mcp_mypy_cache"
 ignore_missing_imports = true
 check_untyped_defs = false
 warn_unused_ignores = false
+
+[tool.git_guard]
+profile = "mcp-tool-repo"
+
+[tool.git_guard.allow_categories]
+mcp_tool_info = [
+    ".github/**",
+    "CONTRIBUTING.md",
+    "README.md",
+    "SECURITY.md",
+    "Docs/**",
+    "pyproject.toml",
+    "src/notion_mcp/**",
+    "tests/**",
+]
+email_address = ["pyproject.toml"]
+placeholder_user_path = ["**"]
+placeholder_email = ["**"]
+placeholder_secret = ["**"]
+
+[tool.git_guard.warn_categories]
+code_variable_secret_keyword = ["**"]
+ssh_public_key = ["**"]
+
+[tool.git_guard.allow_placeholders]
+absolute_user_path = ["/home/<USER>/**", "/Users/<USER>/**", "C:\\Users\\<USER>\\**"]
+email_address = ["<EMAIL>"]
+local_username = ["<USER>", "<USERNAME>"]
+dotenv_secret = ["<TOKEN>", "<SECRET>", "<API_KEY>", "<PASSWORD>"]

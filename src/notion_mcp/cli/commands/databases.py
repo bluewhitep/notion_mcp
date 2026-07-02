@@ -12,7 +12,12 @@ from pathlib import Path
 
 import typer
 
-from notion_mcp.core.attachments import ContextResolver, DatabaseAttachment, DatabaseAttachmentStore, PageAttachmentStore
+from notion_mcp.core.attachments import (
+    ContextResolver,
+    DatabaseAttachment,
+    DatabaseAttachmentStore,
+    PageAttachmentStore,
+)
 from notion_mcp.core.errors import CoreError
 from notion_mcp.core.identifiers import parse_notion_page_id
 from notion_mcp.core.models import dry_run_result

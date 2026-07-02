@@ -1,0 +1,55 @@
+name: Bug report
+description: Report a reproducible problem in notion-mcp.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include real Notion tokens, private workspace data, local config
+        files, or unredacted logs. Sensitive security reports should follow
+        SECURITY.md instead of a public issue.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest command sequence or MCP client flow that reproduces the issue.
+      placeholder: |
+        1. Run `notion-mcp ...`
+        2. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include sanitized output only.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: "notion-mcp 0.2.0 or commit SHA"
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, install method, MCP client if applicable.
+      placeholder: |
+        OS:
+        Python:
+        Install method:
+        MCP client:
