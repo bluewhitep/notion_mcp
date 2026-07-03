@@ -11,6 +11,35 @@ This repository provides a local Notion MCP server with a Core + CLI + MCP Tool 
 
 The project is in alpha. Public APIs, CLI commands, and MCP tool contracts may still change before a stable release.
 
+## Installation
+
+### PyPI release
+
+Use this method after the first PyPI release is published:
+
+```bash
+uv tool install notion-mcp
+notion-mcp --help
+```
+
+If you do not use `uv`, install with `pip` instead:
+
+```bash
+pip install notion-mcp
+notion-mcp --help
+```
+
+### GitHub source
+
+Use this method to install directly from the public source repository:
+
+```bash
+git clone https://github.com/bluewhitep/notion_mcp.git
+cd notion_mcp
+uv tool install .
+notion-mcp --help
+```
+
 ## Documentation
 
 - [Installation](Docs/User/Installation.md)
@@ -22,8 +51,8 @@ The project is in alpha. Public APIs, CLI commands, and MCP tool contracts may s
 
 ## Roadmap
 
-- Publish the GitHub repository after OSS release files are committed and CI passes.
-- Defer PyPI publication until a package release is intentionally needed. The project can stay source-installable from GitHub before that.
+- Publish the initial PyPI package from GitHub Release `v0.2.0`.
+- Keep GitHub source installation available for users who want the latest repository state before a PyPI release.
 
 ## Development
 
