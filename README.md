@@ -51,7 +51,7 @@ notion-mcp --help
 
 ## Roadmap
 
-- Publish the initial PyPI package from GitHub Release `v0.2.0`.
+- Publish the initial PyPI package from GitHub Release `v_0.2.0`.
 - Keep GitHub source installation available for users who want the latest repository state before a PyPI release.
 
 ## Development
