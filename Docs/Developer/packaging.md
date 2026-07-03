@@ -96,10 +96,38 @@ uv run --no-project --with . notion-mcp server run --help
 uv run pytest -q -p no:cacheprovider
 uv run ruff check .
 uv run mypy src
+uv build --out-dir /tmp/notion-mcp-dist-check
 ```
 
 `ruff` 和 `mypy` 的缓存目录配置到 `/tmp`，避免在仓库中留下 `.ruff_cache/`
 或 `.mypy_cache/`。
+
+## PyPI Publication
+
+PyPI 发布使用 GitHub Actions Trusted Publishing，不在仓库或 GitHub secrets 中保存
+PyPI API token。
+
+仓库侧准备：
+
+- `.github/workflows/publish.yml` 在 GitHub Release `published` 事件上构建并上传包。
+- 同一个 workflow 支持 `workflow_dispatch`，但手动触发只构建分发包，不上传 PyPI。
+- `publish` job 只授予 `contents: read` 和 `id-token: write`，用于 GitHub OIDC。
+- GitHub environment 名称为 `pypi`。
+
+PyPI 侧发布前必须完成：
+
+1. 在 PyPI 创建或保留 `notion-mcp` 项目名。
+2. 为 GitHub 仓库配置 Trusted Publisher。
+3. Trusted Publisher 的 workflow 文件名必须匹配 `publish.yml`。
+4. Trusted Publisher 的 environment 必须匹配 `pypi`。
+5. 确认 GitHub Release tag 对应的版本已写入 `pyproject.toml`。
+
+发布流程：
+
+1. 确认 CI 通过。
+2. 确认本地 release checks 通过。
+3. 创建 GitHub Release。
+4. GitHub Release 发布后，由 `publish.yml` 上传 sdist 和 wheel 到 PyPI。
 
 ## Generated Files
 
