@@ -20,7 +20,7 @@
 
 ## 如何使用
 
-详细的安装与使用说明请参阅 `Docs/User/Guide.md`。简而言之，用户需要先通过 CLI 初始化配置（设置 Notion 集成的 token 和个人的 UUID），然后启动服务即可通过 HTTP 调用接口操作 Notion 数据。关于开发流程和 API 参考，请参阅 `Docs/Developer/API.md`。
+详细的安装与使用说明请参阅 `Docs/EN/User/Guide.md`。简而言之，用户需要先通过 CLI 初始化配置（设置 Notion 集成的 token 和个人的 UUID），然后启动服务即可通过 HTTP 调用接口操作 Notion 数据。关于开发流程和 API 参考，请参阅 `Docs/EN/Developer/API.md`。
 
 ## 开发与贡献
 

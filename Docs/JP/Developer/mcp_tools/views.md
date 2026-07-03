@@ -1,0 +1,21 @@
+# View Tools
+
+- `view_list`
+  - 説明: raw view query parameters で views を一覧します。
+  - Required parameters: `params`.
+- `view_retrieve`
+  - 説明: view を読み取ります。
+  - Required parameters: `view_id`.
+- `view_create`
+  - 説明: view を作成します。
+  - Required parameters: `payload`.
+  - Optional parameters: `dry_run`.
+- `view_update`
+  - 説明: view を更新します。
+  - Required parameters: `view_id`, `payload`.
+  - Optional parameters: `dry_run`.
+- `view_query`
+  - 説明: view を query します。
+  - Required parameters: `view_id`.
+  - Optional parameters: `payload`.
+  - Live requirement: current Notion API/SDK の view object support に依存します。

@@ -1,0 +1,21 @@
+# View Tools
+
+- `view_list`
+  - Description: lists views using raw view query parameters.
+  - Required parameters: `params`.
+- `view_retrieve`
+  - Description: reads a view.
+  - Required parameters: `view_id`.
+- `view_create`
+  - Description: creates a view.
+  - Required parameters: `payload`.
+  - Optional parameters: `dry_run`.
+- `view_update`
+  - Description: updates a view.
+  - Required parameters: `view_id`, `payload`.
+  - Optional parameters: `dry_run`.
+- `view_query`
+  - Description: queries a view.
+  - Required parameters: `view_id`.
+  - Optional parameters: `payload`.
+  - Live requirement: depends on current Notion API/SDK view object support.

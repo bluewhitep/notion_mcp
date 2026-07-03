@@ -12,15 +12,16 @@ def read_doc(relative_path: str) -> str:
 
 def test_developer_and_user_doc_entrypoints_are_split() -> None:
     """Developer docs and user docs must expose separate MCP-oriented entrypoints."""
-    assert (REPO_ROOT / "Docs" / "Developer").is_dir()
-    assert (REPO_ROOT / "Docs" / "User").is_dir()
-    assert (REPO_ROOT / "Docs" / "Developer" / "mcp_tools").is_dir()
-    assert (REPO_ROOT / "Docs" / "User" / "MCP_Clients.md").is_file()
+    for language in ["EN", "ZH", "JP"]:
+        assert (REPO_ROOT / "Docs" / language / "Developer").is_dir()
+        assert (REPO_ROOT / "Docs" / language / "User").is_dir()
+        assert (REPO_ROOT / "Docs" / language / "Developer" / "mcp_tools").is_dir()
+        assert (REPO_ROOT / "Docs" / language / "User" / "MCP_Clients.md").is_file()
 
 
 def test_architecture_documents_mcp_server_as_primary_entry() -> None:
     """Developer architecture docs must present MCP server lifecycle as the primary server entry."""
-    architecture = read_doc("Docs/Developer/architecture/overview.md")
+    architecture = read_doc("Docs/EN/Developer/architecture/overview.md")
 
     assert "Core" in architecture
     assert "CLI" in architecture
@@ -31,7 +32,7 @@ def test_architecture_documents_mcp_server_as_primary_entry() -> None:
 
 def test_design_documents_core_cli_mcp_call_boundaries() -> None:
     """Architecture docs must state that CLI and MCP both call Core."""
-    design = read_doc("Docs/Developer/architecture/overview.md")
+    design = read_doc("Docs/EN/Developer/architecture/overview.md")
 
     assert "Core" in design
     assert "CLI" in design
@@ -43,7 +44,7 @@ def test_design_documents_core_cli_mcp_call_boundaries() -> None:
 
 def test_tech_stack_includes_uv_and_mcp_sdk() -> None:
     """Packaging docs must include uv and the MCP Python SDK as planned dependencies."""
-    tech_stack = read_doc("Docs/Developer/packaging.md")
+    tech_stack = read_doc("Docs/EN/Developer/packaging.md")
 
     assert "uv" in tech_stack
     assert "mcp" in tech_stack

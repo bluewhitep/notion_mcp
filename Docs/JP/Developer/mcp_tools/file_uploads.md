@@ -1,0 +1,21 @@
+# File Upload Tools
+
+- `file_upload_create`
+  - 説明: file upload object を作成します。
+  - Required parameters: `payload`.
+  - Optional parameters: `dry_run`.
+- `file_upload_list`
+  - 説明: pagination 付きで file upload objects を一覧します。
+  - Optional parameters: `page_size`, `start_cursor`.
+- `file_upload_retrieve`
+  - 説明: file upload object を読み取ります。
+  - Required parameters: `file_upload_id`.
+- `file_upload_send`
+  - 説明: file upload payload を送信します。
+  - Required parameters: `file_upload_id`, `payload`.
+  - Optional parameters: `dry_run`.
+- `file_upload_complete`
+  - 説明: file upload を完了します。
+  - Required parameters: `file_upload_id`.
+  - Optional parameters: `payload`, `dry_run`.
+  - Live requirement: real file と Notion workspace permissions。

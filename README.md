@@ -1,5 +1,7 @@
 # N.I.L.O.
 
+[![CI](https://github.com/bluewhitep/notion-nilo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bluewhitep/notion-nilo/actions/workflows/ci.yml) [![Python](https://img.shields.io/badge/python-%3E%3D3.10-blue.svg)](pyproject.toml) [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE) [![Status](https://img.shields.io/badge/status-alpha-orange.svg)](#status) [![Docs](https://img.shields.io/badge/docs-EN%20%7C%20ZH%20%7C%20JP-blue.svg)](Docs/README.md)
+
 N.I.L.O. - Notion Interfaces, Locally Operated - provides a local Notion runtime with a Core + CLI + MCP Tool architecture.
 
 ## Status
@@ -53,12 +55,20 @@ Existing `.notion_mcp/` project context directories and `NOTION_MCP_*` environme
 
 ## Documentation
 
-- [Installation](Docs/User/Installation.md)
-- [Configuration](Docs/User/Configuration.md)
-- [MCP client setup](Docs/User/MCP_Clients.md)
-- [CLI reference](Docs/User/Cli.md)
-- [Troubleshooting](Docs/User/Troubleshooting.md)
-- [Developer packaging notes](Docs/Developer/packaging.md)
+Documentation is organized by language:
+
+- [English](Docs/EN/README.md)
+- [中文](Docs/ZH/README.md)
+- [日本語](Docs/JP/README.md)
+
+Primary English entrypoints:
+
+- [Installation](Docs/EN/User/Installation.md)
+- [Configuration](Docs/EN/User/Configuration.md)
+- [MCP client setup](Docs/EN/User/MCP_Clients.md)
+- [CLI reference](Docs/EN/User/Cli.md)
+- [Troubleshooting](Docs/EN/User/Troubleshooting.md)
+- [Developer packaging notes](Docs/EN/Developer/packaging.md)
 
 ## Roadmap
 

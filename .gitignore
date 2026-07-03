@@ -41,4 +41,5 @@ dist/
 .dev_docs/
 .private_docs/
 tests/v5/
-Docs/skills/test_copies/
+Docs/.Dev/
+Docs/EN/Developer/Reference/Skills/test_copies/

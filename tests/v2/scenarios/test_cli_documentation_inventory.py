@@ -6,8 +6,8 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 def read_user_cli_docs() -> str:
     paths = [
-        REPO_ROOT / "Docs/User/Cli.md",
-        *sorted((REPO_ROOT / "Docs/User/Cli").glob("*.md")),
+        REPO_ROOT / "Docs/EN/User/Cli.md",
+        *sorted((REPO_ROOT / "Docs/EN/User/Cli").glob("*.md")),
     ]
     return "\n".join(path.read_text(encoding="utf-8") for path in paths)
 
@@ -94,6 +94,6 @@ def test_user_cli_doc_lists_all_current_cli_commands() -> None:
 def test_user_cli_doc_positions_raw_api_as_advanced_fallback() -> None:
     text = read_user_cli_docs()
 
-    assert "Raw API 只作为高级兜底入口" in text
+    assert "Raw API is an advanced fallback entrypoint" in text
     assert "nilo raw-api operations" in text
     assert "nilo raw-api invoke" in text

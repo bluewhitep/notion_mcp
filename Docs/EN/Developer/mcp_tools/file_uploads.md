@@ -1,0 +1,21 @@
+# File Upload Tools
+
+- `file_upload_create`
+  - Description: creates a file upload object.
+  - Required parameters: `payload`.
+  - Optional parameters: `dry_run`.
+- `file_upload_list`
+  - Description: lists file upload objects with pagination.
+  - Optional parameters: `page_size`, `start_cursor`.
+- `file_upload_retrieve`
+  - Description: reads a file upload object.
+  - Required parameters: `file_upload_id`.
+- `file_upload_send`
+  - Description: sends file upload payload.
+  - Required parameters: `file_upload_id`, `payload`.
+  - Optional parameters: `dry_run`.
+- `file_upload_complete`
+  - Description: completes a file upload.
+  - Required parameters: `file_upload_id`.
+  - Optional parameters: `payload`, `dry_run`.
+  - Live requirement: a real file and Notion workspace permissions.

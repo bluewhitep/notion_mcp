@@ -10,7 +10,7 @@ USER_DOC_FORBIDDEN_PATTERNS = [
     re.compile(r"\bv2/v3\b", re.IGNORECASE),
     re.compile(r"\bv[23]\b", re.IGNORECASE),
     re.compile(r"Docs/dev(?:/|$)", re.IGNORECASE),
-    re.compile(r"Docs/Developer(?:/|$)", re.IGNORECASE),
+    re.compile(r"Docs/(?:EN|ZH|JP)/Developer(?:/|$)", re.IGNORECASE),
     re.compile(r"tests/v[0-9]", re.IGNORECASE),
 ]
 
@@ -22,10 +22,11 @@ NON_DEV_DOC_FORBIDDEN_PATTERNS = [
 
 
 def test_user_docs_do_not_expose_development_stage_material() -> None:
-    for path in sorted((REPO_ROOT / "Docs" / "User").rglob("*.md")):
-        text = path.read_text(encoding="utf-8")
-        for pattern in USER_DOC_FORBIDDEN_PATTERNS:
-            assert not pattern.search(text), f"{path.relative_to(REPO_ROOT)} contains {pattern.pattern}"
+    for user_docs in sorted((REPO_ROOT / "Docs").glob("*/User")):
+        for path in sorted(user_docs.rglob("*.md")):
+            text = path.read_text(encoding="utf-8")
+            for pattern in USER_DOC_FORBIDDEN_PATTERNS:
+                assert not pattern.search(text), f"{path.relative_to(REPO_ROOT)} contains {pattern.pattern}"
 
 
 def test_non_dev_docs_do_not_reference_adr_or_versioned_test_paths() -> None:

@@ -43,11 +43,11 @@ def test_raw_api_help_positions_it_as_advanced_fallback() -> None:
 
 def test_user_docs_position_raw_api_as_advanced_not_common_page_database_path() -> None:
     user_cli_paths = [
-        Path("Docs/User/Cli.md"),
-        *sorted(Path("Docs/User/Cli").glob("*.md")),
+        Path("Docs/EN/User/Cli.md"),
+        *sorted(Path("Docs/EN/User/Cli").glob("*.md")),
     ]
     user_cli = "\n".join(path.read_text(encoding="utf-8") for path in user_cli_paths)
 
-    assert "Raw API 只作为高级兜底入口" in user_cli
+    assert "Raw API is an advanced fallback entrypoint" in user_cli
     assert "nilo block update" in user_cli
     assert "nilo database query --payload" in user_cli

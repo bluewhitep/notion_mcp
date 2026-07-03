@@ -1,0 +1,22 @@
+# Page Tools
+
+- `page_retrieve`
+  - 説明: page を読み取ります。
+  - Required parameters: `page_id`; raw ID または Notion URL を受け取れます。
+- `page_property_retrieve`
+  - 説明: pagination 付きで page property item を読み取ります。
+  - Required parameters: `page_id`, `property_id`.
+  - Optional parameters: `page_size`, `start_cursor`.
+- `page_create`
+  - 説明: raw Notion SDK payload から page を作成します。
+  - Required parameters: `payload`.
+  - Optional parameters: `dry_run`.
+- `page_update`
+  - 説明: page を更新します。
+  - Required parameters: `page_id`, `payload`.
+  - Optional parameters: `dry_run`.
+- `page_trash`
+  - 説明: page を trash に移動します。
+  - Required parameters: `page_id`, `confirm`.
+  - Optional parameters: `dry_run`.
+  - Risk: `destructiveHint=true`; `confirm=true` がない場合は `confirmation_required` を返します。

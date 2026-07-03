@@ -1,0 +1,22 @@
+# Page Tools
+
+- `page_retrieve`
+  - Description: reads a page.
+  - Required parameters: `page_id`; accepts a raw ID or Notion URL.
+- `page_property_retrieve`
+  - Description: reads a page property item with pagination.
+  - Required parameters: `page_id`, `property_id`; `page_id` accepts a raw ID or Notion URL.
+  - Optional parameters: `page_size`, `start_cursor`.
+- `page_create`
+  - Description: creates a page from a raw Notion SDK payload.
+  - Required parameters: `payload`.
+  - Optional parameters: `dry_run`.
+- `page_update`
+  - Description: updates a page.
+  - Required parameters: `page_id`, `payload`; `page_id` accepts a raw ID or Notion URL.
+  - Optional parameters: `dry_run`.
+- `page_trash`
+  - Description: moves a page to trash.
+  - Required parameters: `page_id`, `confirm`; `page_id` accepts a raw ID or Notion URL.
+  - Optional parameters: `dry_run`.
+  - Risk: `destructiveHint=true`; missing `confirm=true` returns `confirmation_required`.
