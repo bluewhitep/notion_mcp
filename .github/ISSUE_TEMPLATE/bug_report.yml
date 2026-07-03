@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible problem in notion-mcp.
+description: Report a reproducible problem in nilo.
 title: "[Bug]: "
 body:
   - type: markdown
@@ -21,7 +21,7 @@ body:
       label: Reproduction steps
       description: Provide the smallest command sequence or MCP client flow that reproduces the issue.
       placeholder: |
-        1. Run `notion-mcp ...`
+        1. Run `nilo ...`
         2. Observe ...
     validations:
       required: true
@@ -42,7 +42,7 @@ body:
     id: version
     attributes:
       label: Version or commit
-      placeholder: "notion-mcp 0.2.0 or commit SHA"
+      placeholder: "nilo 0.3.0 or commit SHA"
   - type: textarea
     id: environment
     attributes:

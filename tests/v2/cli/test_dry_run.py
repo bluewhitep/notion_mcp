@@ -2,8 +2,8 @@ import json
 
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
-from notion_mcp.cli.commands import pages
+from nilo.cli import app
+from nilo.cli.commands import pages
 
 from .helpers import plain_cli_output
 

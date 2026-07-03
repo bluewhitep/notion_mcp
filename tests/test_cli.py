@@ -3,9 +3,9 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app as cli_app
-from notion_mcp.config import load_config
-from notion_mcp.core.config import load_core_config
+from nilo.cli import app as cli_app
+from nilo.config import load_config
+from nilo.core.config import load_core_config
 
 
 runner = CliRunner()

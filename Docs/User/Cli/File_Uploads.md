@@ -6,18 +6,18 @@
 
 | 命令 | 作用 |
 | --- | --- |
-| `notion-mcp file-upload retrieve <file_upload_id>` | 读取 file upload 状态。 |
-| `notion-mcp file-upload list` | 列出 file uploads。 |
-| `notion-mcp file-upload create` | 创建 file upload。 |
-| `notion-mcp file-upload send <file_upload_id>` | 发送文件内容。 |
-| `notion-mcp file-upload complete <file_upload_id>` | 完成 file upload。 |
+| `nilo file-upload retrieve <file_upload_id>` | 读取 file upload 状态。 |
+| `nilo file-upload list` | 列出 file uploads。 |
+| `nilo file-upload create` | 创建 file upload。 |
+| `nilo file-upload send <file_upload_id>` | 发送文件内容。 |
+| `nilo file-upload complete <file_upload_id>` | 完成 file upload。 |
 
 ## 示例
 
 ```bash
-notion-mcp file-upload list --json
-notion-mcp file-upload retrieve <file_upload_id> --json
-notion-mcp file-upload create --payload '{}'
-notion-mcp file-upload send <file_upload_id> --path ./example.pdf
-notion-mcp file-upload complete <file_upload_id>
+nilo file-upload list --json
+nilo file-upload retrieve <file_upload_id> --json
+nilo file-upload create --payload '{}'
+nilo file-upload send <file_upload_id> --path ./example.pdf
+nilo file-upload complete <file_upload_id>
 ```

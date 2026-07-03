@@ -16,15 +16,15 @@ from uuid import uuid4
 
 import pytest
 
-from notion_mcp.core.attachments import DatabaseAttachmentStore, PageAttachmentStore
-from notion_mcp.core.client import create_notion_client
-from notion_mcp.core.config import CoreConfig, load_core_config
-from notion_mcp.core.errors import CoreError
-from notion_mcp.core.project import ProjectResolver
-from notion_mcp.core.services.blocks import BlocksService
-from notion_mcp.core.services.data_sources import DataSourcesService
-from notion_mcp.core.services.pages import PagesService
-from notion_mcp.core.services.pages import extract_block_text
+from nilo.core.attachments import DatabaseAttachmentStore, PageAttachmentStore
+from nilo.core.client import create_notion_client
+from nilo.core.config import CoreConfig, load_core_config
+from nilo.core.errors import CoreError
+from nilo.core.project import ProjectResolver
+from nilo.core.services.blocks import BlocksService
+from nilo.core.services.data_sources import DataSourcesService
+from nilo.core.services.pages import PagesService
+from nilo.core.services.pages import extract_block_text
 
 
 pytestmark = pytest.mark.live

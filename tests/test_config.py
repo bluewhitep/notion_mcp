@@ -3,14 +3,14 @@ from pathlib import Path
 
 import pytest
 
-from notion_mcp.config import (
+from nilo.config import (
     get_config_path,
     load_config,
     save_config,
     set_token,
     set_user,
 )
-from notion_mcp.models import Config
+from nilo.models import Config
 
 
 def test_save_and_load_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

@@ -6,8 +6,8 @@ import subprocess
 from pathlib import Path
 
 
-def test_uv_installed_package_imports_notion_mcp(tmp_path: Path) -> None:
-    """The package installed by uv must make notion_mcp importable."""
+def test_uv_installed_package_imports_nilo(tmp_path: Path) -> None:
+    """The package installed by uv must make nilo importable."""
     uv = shutil.which("uv")
     assert uv is not None, "uv is required for packaging validation"
 
@@ -25,7 +25,7 @@ def test_uv_installed_package_imports_notion_mcp(tmp_path: Path) -> None:
             str(repo_root),
             "python",
             "-c",
-            "import notion_mcp; print(notion_mcp.__version__)",
+            "import nilo; print(nilo.__version__)",
         ],
         cwd=repo_root,
         env=env,

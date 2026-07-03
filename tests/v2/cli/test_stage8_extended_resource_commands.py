@@ -3,8 +3,8 @@ import json
 
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
-from notion_mcp.cli.commands import comments, custom_emojis, data_sources, file_uploads, raw_api, search, users, views
+from nilo.cli import app
+from nilo.cli.commands import comments, custom_emojis, data_sources, file_uploads, raw_api, search, users, views
 
 
 runner = CliRunner()

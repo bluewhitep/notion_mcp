@@ -2,8 +2,8 @@ import uuid
 
 import pytest
 
-from notion_mcp.core.auth import AuthService
-from notion_mcp.core.errors import NotionAuthError
+from nilo.core.auth import AuthService
+from nilo.core.errors import NotionAuthError
 
 
 class FakeUsers:

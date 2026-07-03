@@ -7,14 +7,14 @@
 运行：
 
 ```bash
-notion-mcp config --global user.token ntn_xxx
-notion-mcp config --global user.name "Ada"
+nilo config --global user.token ntn_xxx
+nilo config --global user.name "Ada"
 ```
 
 然后检查：
 
 ```bash
-notion-mcp config --global --show
+nilo config --global --show
 ```
 
 ## token 无权限
@@ -26,7 +26,7 @@ notion-mcp config --global --show
 普通用户不需要手动填写 `user_id`。如果高级配置中已经设置了 `user_id`，且 `auth validate` 报告用户不匹配，请先运行：
 
 ```bash
-notion-mcp auth whoami --json
+nilo auth whoami --json
 ```
 
 确认当前 token 对应的 Notion identity 是否符合预期。
@@ -36,15 +36,15 @@ notion-mcp auth whoami --json
 先在终端确认：
 
 ```bash
-notion-mcp server stdio --help
-notion-mcp server run --help
+nilo server stdio --help
+nilo server run --help
 ```
 
 client 配置应使用：
 
 ```json
 {
-  "command": "notion-mcp",
+  "command": "nilo",
   "args": ["server", "stdio"]
 }
 ```
@@ -52,8 +52,8 @@ client 配置应使用：
 如果使用后台 streamable-http server，检查：
 
 ```bash
-notion-mcp server status
-notion-mcp server logs --tail 100
+nilo server status
+nilo server logs --tail 100
 ```
 
 ## Notion API version 问题

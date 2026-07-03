@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
-from notion_mcp.cli.commands import pages
+from nilo.cli import app
+from nilo.cli.commands import pages
 
 
 runner = CliRunner()
@@ -52,6 +52,6 @@ def test_missing_project_context_errors_include_remediation(
 
     assert status.exit_code == 1
     assert "No .notion_mcp/config.json found" in status.stdout
-    assert "notion-mcp init" in status.stdout
+    assert "nilo init" in status.stdout
     assert content.exit_code == 1
-    assert "notion-mcp page attach <page_id>" in content.stdout
+    assert "nilo page attach <page_id>" in content.stdout

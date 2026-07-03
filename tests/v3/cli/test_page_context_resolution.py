@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from notion_mcp.core.attachments import ContextResolver, PageAttachment, PageAttachmentStore
-from notion_mcp.core.errors import PageAttachmentNotFoundError
-from notion_mcp.core.project import ProjectConfigStore
+from nilo.core.attachments import ContextResolver, PageAttachment, PageAttachmentStore
+from nilo.core.errors import PageAttachmentNotFoundError
+from nilo.core.project import ProjectConfigStore
 
 
 def test_page_context_resolver_prefers_explicit_page_id(tmp_path: Path) -> None:
@@ -42,4 +42,4 @@ def test_page_context_resolver_errors_when_no_page_is_attached(tmp_path: Path) -
         ContextResolver(project_root=tmp_path).resolve_page_id()
 
     assert "No page is attached for this project" in exc_info.value.message
-    assert "notion-mcp page retrieve <page_id>" in exc_info.value.message
+    assert "nilo page retrieve <page_id>" in exc_info.value.message

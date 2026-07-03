@@ -42,7 +42,7 @@ def test_user_docs_do_not_expose_internal_source_paths() -> None:
 
     for path in user_docs.rglob("*.md"):
         text = path.read_text(encoding="utf-8")
-        assert "src/notion_mcp" not in text
+        assert "src/nilo" not in text
         assert "tests/v2" not in text
 
 

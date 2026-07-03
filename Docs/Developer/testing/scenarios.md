@@ -29,7 +29,7 @@ Fake Notion client 用于离线验证 CLI/MCP/Core 调用链，不访问真实 N
 场景测试可和全量测试一起运行：
 
 ```bash
-env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_scenarios uv run pytest -q -p no:cacheprovider
+env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/nilo_uv_scenarios uv run pytest -q -p no:cacheprovider
 ```
 
 ## 备注
@@ -41,7 +41,7 @@ env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_scenarios 
 ```bash
 env \
   PYTHONDONTWRITEBYTECODE=1 \
-  UV_CACHE_DIR=/private/tmp/notion_mcp_uv_live_e2e \
+  UV_CACHE_DIR=/private/tmp/nilo_uv_live_e2e \
   NOTION_MCP_LIVE_E2E=1 \
   NOTION_MCP_LIVE_PARENT_PAGE_ID=<test_page_id> \
   NOTION_MCP_LIVE_DATA_SOURCE_ID=<test_data_source_id> \

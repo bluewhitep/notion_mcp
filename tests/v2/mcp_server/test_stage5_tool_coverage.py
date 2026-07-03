@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-from notion_mcp.mcp_server.server import create_mcp_server
-from notion_mcp.mcp_server.tools import users
+from nilo.mcp_server.server import create_mcp_server
+from nilo.mcp_server.tools import users
 
 
 EXPECTED_STAGE5_TOOLS = {

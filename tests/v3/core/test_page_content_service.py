@@ -1,4 +1,4 @@
-from notion_mcp.core.services.pages import PagesService
+from nilo.core.services.pages import PagesService
 
 COMPACT_PAGE_ID = "3799a1afb97a80489bb0e7384f334958"
 CANONICAL_PAGE_ID = "3799a1af-b97a-8048-9bb0-e7384f334958"

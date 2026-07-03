@@ -69,12 +69,12 @@ CLI 是人类入口，负责：
 公开 server 命令包括：
 
 ```text
-notion-mcp server run
-notion-mcp server status
-notion-mcp server stop
-notion-mcp server logs
-notion-mcp server remove
-notion-mcp server stdio
+nilo server run
+nilo server status
+nilo server stop
+nilo server logs
+nilo server remove
+nilo server stdio
 ```
 
 CLI resource command 通过 Core service 调用 Notion 能力。

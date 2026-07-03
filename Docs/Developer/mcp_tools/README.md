@@ -1,13 +1,13 @@
 # MCP Tools 开发者文档
 
-本文档是 MCP tool 文档入口。当前仓库已实现 `src/notion_mcp/mcp_server/`，使用 MCP Python SDK 的 `FastMCP` 暴露本地工具。
+本文档是 MCP tool 文档入口。当前仓库已实现 `src/nilo/mcp_server/`，使用 MCP Python SDK 的 `FastMCP` 暴露本地工具。
 
 ## Server
 
-- server factory：`src/notion_mcp/mcp_server/server.py`
-- package entry：`notion_mcp.mcp_server:create_mcp_server`
-- CLI stdio entry：`notion-mcp server stdio`
-- CLI background HTTP entry：`notion-mcp server run --host 127.0.0.1 --port 8000`
+- server factory：`src/nilo/mcp_server/server.py`
+- package entry：`nilo.mcp_server:create_mcp_server`
+- CLI stdio entry：`nilo server stdio`
+- CLI background HTTP entry：`nilo server run --host 127.0.0.1 --port 8000`
 - 支持 transport：`stdio`、`streamable-http`
 
 ## 工具域文档

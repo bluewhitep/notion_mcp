@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHONDONTWRITEBYTECODE: "1"
-      UV_PROJECT_ENVIRONMENT: /tmp/notion-mcp-ci-${{ matrix.python-version }}
+      UV_PROJECT_ENVIRONMENT: /tmp/nilo-ci-${{ matrix.python-version }}
     strategy:
       fail-fast: false
       matrix:
@@ -47,4 +47,4 @@ jobs:
         run: uv run mypy src
 
       - name: Build package
-        run: uv build --out-dir /tmp/notion-mcp-dist
+        run: uv build --out-dir /tmp/notion-nilo-dist

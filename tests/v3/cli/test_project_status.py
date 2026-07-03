@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
+from nilo.cli import app
 
 
 runner = CliRunner()
@@ -62,7 +62,7 @@ def test_project_status_reports_missing_project_context(
 
     assert result.exit_code == 1
     assert "No .notion_mcp/config.json found" in result.stdout
-    assert "notion-mcp init" in result.stdout
+    assert "nilo init" in result.stdout
 
 
 def test_local_status_and_root_aliases_match_project_commands(

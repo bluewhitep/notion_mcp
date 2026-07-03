@@ -2,7 +2,7 @@ import json
 import uuid
 from pathlib import Path
 
-from notion_mcp.core.audit import AuditRecorder
+from nilo.core.audit import AuditRecorder
 
 
 def test_audit_recorder_writes_jsonl_without_token(tmp_path: Path) -> None:

@@ -1,4 +1,4 @@
-from notion_mcp.core.identifiers import parse_notion_page_id
+from nilo.core.identifiers import parse_notion_page_id
 
 
 COMPACT_PAGE_ID = "3799a1afb97a80489bb0e7384f334958"

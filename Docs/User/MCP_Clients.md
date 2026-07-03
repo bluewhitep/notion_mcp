@@ -7,12 +7,12 @@
 MCP client 不需要直接保存 Notion token。Notion token 保存在本机全局配置里：
 
 ```bash
-notion-mcp config --global user.token ntn_xxx
-notion-mcp config --global user.name "Ada"
-notion-mcp config --global --show
+nilo config --global user.token ntn_xxx
+nilo config --global user.name "Ada"
+nilo config --global --show
 ```
 
-MCP 工具只需要连接本地 `notion-mcp` server。
+MCP 工具只需要连接本地 `nilo` server。
 
 ## 选择连接方式
 
@@ -21,7 +21,7 @@ MCP 工具只需要连接本地 `notion-mcp` server。
 | 方式 | 适合场景 | 是否需要先手动启动 server |
 | --- | --- | --- |
 | stdio | 工具通过 command/args 自动拉起 MCP server | 不需要 |
-| streamable-http | 工具连接一个本地 HTTP MCP URL | 需要先运行 `notion-mcp server run` |
+| streamable-http | 工具连接一个本地 HTTP MCP URL | 需要先运行 `nilo server run` |
 
 优先使用工具支持的方式。如果工具支持 command/args，stdio 通常最简单。如果工具只支持 URL，使用 streamable-http。
 
@@ -33,9 +33,9 @@ stdio 模式由 MCP 工具负责启动和停止 server。
 
 | 字段 | 值 |
 | --- | --- |
-| Server name | `notion-mcp` |
+| Server name | `nilo` |
 | Transport | `stdio` |
-| Command | `notion-mcp` |
+| Command | `nilo` |
 | Arguments | `server`, `stdio` |
 
 如果工具使用 JSON 配置，常见格式是：
@@ -43,8 +43,8 @@ stdio 模式由 MCP 工具负责启动和停止 server。
 ```json
 {
   "mcpServers": {
-    "notion-mcp": {
-      "command": "notion-mcp",
+    "nilo": {
+      "command": "nilo",
       "args": ["server", "stdio"]
     }
   }
@@ -54,16 +54,16 @@ stdio 模式由 MCP 工具负责启动和停止 server。
 如果工具把参数写成一行，填：
 
 ```text
-notion-mcp server stdio
+nilo server stdio
 ```
 
-如果 `notion-mcp` 是通过 `uv tool install .` 安装的，确保终端能直接运行：
+如果 `nilo` 是通过 `uv tool install .` 安装的，确保终端能直接运行：
 
 ```bash
-notion-mcp --help
+nilo --help
 ```
 
-如果工具找不到 `notion-mcp`，先运行：
+如果工具找不到 `nilo`，先运行：
 
 ```bash
 uv tool update-shell
@@ -73,30 +73,30 @@ uv tool update-shell
 
 ## 未安装时的 Stdio 配置
 
-如果还没有把 `notion-mcp` 安装到 PATH，也可以让 MCP 工具通过 `uv` 从仓库路径临时运行。
+如果还没有把 `nilo` 安装到 PATH，也可以让 MCP 工具通过 `uv` 从仓库路径临时运行。
 
 工具里填写：
 
 | 字段 | 值 |
 | --- | --- |
-| Server name | `notion-mcp` |
+| Server name | `nilo` |
 | Transport | `stdio` |
 | Command | `uv` |
-| Arguments | `run`, `--no-project`, `--with`, `/path/to/notion_mcp_project`, `notion-mcp`, `server`, `stdio` |
+| Arguments | `run`, `--no-project`, `--with`, `/path/to/notion-nilo`, `nilo`, `server`, `stdio` |
 
 JSON 示例：
 
 ```json
 {
   "mcpServers": {
-    "notion-mcp": {
+    "nilo": {
       "command": "uv",
       "args": [
         "run",
         "--no-project",
         "--with",
-        "/path/to/notion_mcp_project",
-        "notion-mcp",
+        "/path/to/notion-nilo",
+        "nilo",
         "server",
         "stdio"
       ]
@@ -105,27 +105,27 @@ JSON 示例：
 }
 ```
 
-把 `/path/to/notion_mcp_project` 替换成当前仓库根目录。
+把 `/path/to/notion-nilo` 替换成当前仓库根目录。
 
 ## Streamable HTTP 配置
 
 如果工具支持 MCP URL 或 streamable-http，先在本机后台启动 server：
 
 ```bash
-notion-mcp server run --host 127.0.0.1 --port 8000
+nilo server run --host 127.0.0.1 --port 8000
 ```
 
 确认状态：
 
 ```bash
-notion-mcp server status
+nilo server status
 ```
 
 工具里填写：
 
 | 字段 | 值 |
 | --- | --- |
-| Server name | `notion-mcp` |
+| Server name | `nilo` |
 | Transport | `streamable-http` |
 | URL | `http://127.0.0.1:8000/mcp` |
 | Authentication | None |
@@ -135,7 +135,7 @@ notion-mcp server status
 ```json
 {
   "mcpServers": {
-    "notion-mcp": {
+    "nilo": {
       "transport": "streamable-http",
       "url": "http://127.0.0.1:8000/mcp"
     }
@@ -149,41 +149,41 @@ notion-mcp server status
 http://127.0.0.1:8000/mcp
 ```
 
-不要在工具里填写 Notion token。token 已由本地 `notion-mcp` 配置读取。
+不要在工具里填写 Notion token。token 已由本地 `nilo` 配置读取。
 
 ## 后台 Server 管理
 
 查看状态：
 
 ```bash
-notion-mcp server status
+nilo server status
 ```
 
 查看日志：
 
 ```bash
-notion-mcp server logs --tail 100
+nilo server logs --tail 100
 ```
 
 停止：
 
 ```bash
-notion-mcp server stop
+nilo server stop
 ```
 
 清理本地 server state 和日志：
 
 ```bash
-notion-mcp server remove
+nilo server remove
 ```
 
 如果清理时需要强制停止 server，可以使用：
 
 ```bash
-notion-mcp server remove --force
+nilo server remove --force
 ```
 
-这只清理后台 server runtime。若要从 MCP client 中移除 `notion-mcp`，或继续卸载本地命令行工具、本地 token 和项目上下文，见 [Uninstallation](Uninstallation.md)。
+这只清理后台 server runtime。若要从 MCP client 中移除 `nilo`，或继续卸载本地命令行工具、本地 token 和项目上下文，见 [Uninstallation](Uninstallation.md)。
 
 ## 环境变量
 
@@ -198,8 +198,8 @@ stdio JSON 示例：
 ```json
 {
   "mcpServers": {
-    "notion-mcp": {
-      "command": "notion-mcp",
+    "nilo": {
+      "command": "nilo",
       "args": ["server", "stdio"],
       "env": {
         "NOTION_MCP_CONFIG": "/path/to/config.json"
@@ -290,11 +290,11 @@ stdio JSON 示例：
 
 如果工具没有显示 Notion MCP tools：
 
-1. 先在终端运行 `notion-mcp --help`，确认命令可用。
+1. 先在终端运行 `nilo --help`，确认命令可用。
 2. stdio 模式检查 command 和 args 是否分别填写，不要把整行命令都塞进 command 字段。
-3. streamable-http 模式检查 `notion-mcp server status` 是否显示 running。
-4. 查看日志：`notion-mcp server logs --tail 100`。
-5. 确认 Notion token 已配置：`notion-mcp config --global --show`。
+3. streamable-http 模式检查 `nilo server status` 是否显示 running。
+4. 查看日志：`nilo server logs --tail 100`。
+5. 确认 Notion token 已配置：`nilo config --global --show`。
 
 ## 安全说明
 

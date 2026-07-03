@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
+from nilo.cli import app
 
 
 runner = CliRunner()

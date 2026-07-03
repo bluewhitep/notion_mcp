@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
-from notion_mcp.cli.commands import pages
+from nilo.cli import app
+from nilo.cli.commands import pages
 
 
 runner = CliRunner()
@@ -90,4 +90,4 @@ def test_page_status_errors_when_no_page_is_attached(
 
     assert status.exit_code == 1
     assert "No page is attached for this project" in status.stdout
-    assert "notion-mcp page attach <page_id>" in status.stdout
+    assert "nilo page attach <page_id>" in status.stdout

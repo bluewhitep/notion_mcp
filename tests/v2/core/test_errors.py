@@ -1,4 +1,4 @@
-from notion_mcp.core.errors import (
+from nilo.core.errors import (
     ConfigNotFoundError,
     CoreError,
     NotionAuthError,

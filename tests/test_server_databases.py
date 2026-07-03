@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from notion_mcp.server import app, get_notion_client
+from nilo.server import app, get_notion_client
 
 
 class FakeDataSources:

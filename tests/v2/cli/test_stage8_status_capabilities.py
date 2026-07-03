@@ -1,4 +1,4 @@
-from notion_mcp.cli.commands.status import build_status
+from nilo.cli.commands.status import build_status
 
 
 def test_status_reports_mcp_server_available_after_stage4() -> None:

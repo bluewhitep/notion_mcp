@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
-from notion_mcp.cli.commands import databases, pages
+from nilo.cli import app
+from nilo.cli.commands import databases, pages
 
 
 runner = CliRunner()

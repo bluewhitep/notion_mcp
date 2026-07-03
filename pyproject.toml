@@ -3,9 +3,9 @@ requires = ["hatchling>=1.25"]
 build-backend = "hatchling.build"
 
 [project]
-name = "notion-mcp"
-version = "0.2.0"
-description = "A local Notion MCP server with Core, CLI, and MCP tool entrypoints"
+name = "notion-nilo"
+version = "0.3.0"
+description = "N.I.L.O. - Notion Interfaces, Locally Operated: a local Notion runtime with Core, CLI, and MCP tool entrypoints"
 authors = [ { name = "Jieqiang Zhang", email = "20318684+bluewhitep@users.noreply.github.com" } ]
 readme = "README.md"
 requires-python = ">=3.10"
@@ -49,8 +49,41 @@ dev = [
     "mypy>=1.10",
 ]
 
+[tool.hatch.build.targets.sdist]
+include = [
+    "/CONTRIBUTING.md",
+    "/Docs",
+    "/LICENSE",
+    "/README.md",
+    "/SECURITY.md",
+    "/env.example",
+    "/pyproject.toml",
+    "/requirements.txt",
+    "/src",
+    "/tests",
+    "/tomllib.py",
+]
+exclude = [
+    "/.notion_mcp",
+    "/.notion_mcp/**",
+    "/Docs/skills/test_copies",
+    "/tests/v5",
+]
+
 [tool.hatch.build.targets.wheel]
-packages = ["src/notion_mcp"]
+packages = ["src/nilo"]
+
+[tool.hatch.build]
+exclude = [
+    "/.agents",
+    "/.codex",
+    "/.notion_mcp",
+    "/.mypy_cache",
+    "/.pytest_cache",
+    "/.ruff_cache",
+    "/.venv",
+    "/project.tmp",
+]
 
 [tool.pytest.ini_options]
 pythonpath = ["src", "."]
@@ -60,18 +93,18 @@ markers = [
 ]
 
 [project.scripts]
-notion-mcp = "notion_mcp.cli:app"
+nilo = "nilo.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/bluewhitep/notion_mcp"
-Repository = "https://github.com/bluewhitep/notion_mcp"
-Issues = "https://github.com/bluewhitep/notion_mcp/issues"
-Documentation = "https://github.com/bluewhitep/notion_mcp/tree/main/Docs"
+Homepage = "https://github.com/bluewhitep/notion-nilo"
+Repository = "https://github.com/bluewhitep/notion-nilo"
+Issues = "https://github.com/bluewhitep/notion-nilo/issues"
+Documentation = "https://github.com/bluewhitep/notion-nilo/tree/main/Docs"
 
 [tool.ruff]
 line-length = 120
 target-version = "py310"
-cache-dir = "/tmp/notion_mcp_ruff_cache"
+cache-dir = "/tmp/nilo_ruff_cache"
 
 [tool.ruff.lint]
 select = ["E", "F"]
@@ -82,7 +115,7 @@ select = ["E", "F"]
 [tool.mypy]
 python_version = "3.10"
 mypy_path = "src"
-cache_dir = "/tmp/notion_mcp_mypy_cache"
+cache_dir = "/tmp/nilo_mypy_cache"
 ignore_missing_imports = true
 check_untyped_defs = false
 warn_unused_ignores = false
@@ -98,7 +131,7 @@ mcp_tool_info = [
     "SECURITY.md",
     "Docs/**",
     "pyproject.toml",
-    "src/notion_mcp/**",
+    "src/nilo/**",
     "tests/**",
 ]
 email_address = ["pyproject.toml"]

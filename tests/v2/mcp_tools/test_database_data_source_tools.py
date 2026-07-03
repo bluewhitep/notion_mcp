@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from notion_mcp.mcp_server.server import create_mcp_server
-from notion_mcp.mcp_server.tools import data_sources, databases
+from nilo.mcp_server.server import create_mcp_server
+from nilo.mcp_server.tools import data_sources, databases
 
 
 EXPECTED_DATABASE_DATA_SOURCE_TOOLS = {
@@ -130,11 +130,11 @@ async def test_data_source_mcp_tools_call_data_source_service(monkeypatch) -> No
 
 def test_database_data_source_mcp_tools_do_not_import_cli_or_sdk_directly() -> None:
     for relative_path in [
-        "src/notion_mcp/mcp_server/tools/databases.py",
-        "src/notion_mcp/mcp_server/tools/data_sources.py",
+        "src/nilo/mcp_server/tools/databases.py",
+        "src/nilo/mcp_server/tools/data_sources.py",
     ]:
         source = Path(relative_path).read_text(encoding="utf-8")
-        assert "notion_mcp.cli" not in source
+        assert "nilo.cli" not in source
         assert "notion_client" not in source
         assert "from notion_client" not in source
         assert "import notion_client" not in source

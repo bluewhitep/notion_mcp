@@ -16,13 +16,13 @@
 MCP focused 验证：
 
 ```bash
-env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_mcp uv run pytest -q -p no:cacheprovider
+env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/nilo_uv_mcp uv run pytest -q -p no:cacheprovider
 ```
 
 隔离安装 MCP help 验证：
 
 ```bash
-env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_mcp_install uv run --no-project --with . notion-mcp server run --help
+env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/nilo_uv_mcp_install uv run --no-project --with . nilo server run --help
 ```
 
 ## 备注

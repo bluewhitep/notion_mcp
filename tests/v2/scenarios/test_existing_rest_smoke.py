@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from notion_mcp.server import app
+from nilo.server import app
 
 
 def test_legacy_fastapi_root_still_responds() -> None:

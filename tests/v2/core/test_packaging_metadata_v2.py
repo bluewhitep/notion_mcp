@@ -27,7 +27,7 @@ def test_uv_installed_package_imports_outside_repo_cwd(tmp_path: Path) -> None:
             str(repo_root),
             "python",
             "-c",
-            "import notion_mcp; print(notion_mcp.__version__)",
+            "import nilo; print(nilo.__version__)",
         ],
         cwd=run_cwd,
         env=env,

@@ -2,9 +2,9 @@ import json
 
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
-from notion_mcp.cli.commands import server as server_commands
-from notion_mcp.mcp_server.process_manager import ServerRuntimeState
+from nilo.cli import app
+from nilo.cli.commands import server as server_commands
+from nilo.mcp_server.process_manager import ServerRuntimeState
 
 
 runner = CliRunner()
@@ -24,7 +24,7 @@ def test_server_run_passes_host_port_and_prints_json(monkeypatch) -> None:
             state_file="/tmp/server.state.json",
             log_file="/tmp/server.log",
             started_at="2026-06-09T00:00:00Z",
-            command=["python", "-m", "notion_mcp.mcp_server.runner"],
+            command=["python", "-m", "nilo.mcp_server.runner"],
         )
 
     monkeypatch.setattr(server_commands, "start_background_server", fake_start_background_server)

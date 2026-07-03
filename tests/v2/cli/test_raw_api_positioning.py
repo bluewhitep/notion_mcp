@@ -3,7 +3,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
+from nilo.cli import app
 
 
 runner = CliRunner()
@@ -49,5 +49,5 @@ def test_user_docs_position_raw_api_as_advanced_not_common_page_database_path() 
     user_cli = "\n".join(path.read_text(encoding="utf-8") for path in user_cli_paths)
 
     assert "Raw API 只作为高级兜底入口" in user_cli
-    assert "notion-mcp block update" in user_cli
-    assert "notion-mcp database query --payload" in user_cli
+    assert "nilo block update" in user_cli
+    assert "nilo database query --payload" in user_cli

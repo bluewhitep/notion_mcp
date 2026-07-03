@@ -36,6 +36,6 @@ uv run pytest -q tests/live
 如果需要隔离安装验证：
 
 ```bash
-uv run --no-project --with . notion-mcp --help
-uv run --no-project --with . notion-mcp server run --help
+uv run --no-project --with . nilo --help
+uv run --no-project --with . nilo server run --help
 ```

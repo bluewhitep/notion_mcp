@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 from uuid import uuid4
 
-from notion_mcp.core.client import NotionClientFactory
-from notion_mcp.core.config import DEFAULT_NOTION_VERSION, CoreConfig, load_core_config, save_core_config
+from nilo.core.client import NotionClientFactory
+from nilo.core.config import DEFAULT_NOTION_VERSION, CoreConfig, load_core_config, save_core_config
 
 
 class CapturingNotionClient:
@@ -48,11 +48,11 @@ def test_notion_client_factory_injects_only_configured_version() -> None:
 def test_notion_version_is_not_hardcoded_outside_config_and_tests() -> None:
     forbidden_versions = ["2025-09-03", "2026-03-11"]
     allowed_files = {
-        Path("src/notion_mcp/core/config.py"),
+        Path("src/nilo/core/config.py"),
         Path("tests/v2/core/test_notion_version_policy.py"),
     }
 
-    for path in Path("src/notion_mcp").rglob("*.py"):
+    for path in Path("src/nilo").rglob("*.py"):
         if path in allowed_files:
             continue
         source = path.read_text(encoding="utf-8")

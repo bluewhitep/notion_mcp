@@ -1,10 +1,10 @@
-from notion_mcp.core.services.comments import CommentsService
-from notion_mcp.core.services.custom_emojis import CustomEmojisService
-from notion_mcp.core.errors import NotionOperationError
-from notion_mcp.core.services.file_uploads import FileUploadsService
-from notion_mcp.core.services.pages import PagesService
-from notion_mcp.core.services.users import UsersService
-from notion_mcp.core.services.views import ViewsService
+from nilo.core.services.comments import CommentsService
+from nilo.core.services.custom_emojis import CustomEmojisService
+from nilo.core.errors import NotionOperationError
+from nilo.core.services.file_uploads import FileUploadsService
+from nilo.core.services.pages import PagesService
+from nilo.core.services.users import UsersService
+from nilo.core.services.views import ViewsService
 
 
 class Recorder:

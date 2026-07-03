@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from notion_mcp.core.errors import ProjectConfigNotFoundError
-from notion_mcp.core.project import ProjectConfigStore, ProjectResolver
+from nilo.core.errors import ProjectConfigNotFoundError
+from nilo.core.project import ProjectConfigStore, ProjectResolver
 
 
 def test_project_resolver_finds_project_root_from_child_directory(tmp_path: Path) -> None:

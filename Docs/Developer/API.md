@@ -4,10 +4,10 @@
 
 ## 当前接口状态
 
-- `src/notion_mcp/core/`：唯一业务逻辑层，供 CLI、MCP Tool 和兼容代码复用。
-- `src/notion_mcp/server.py` 与 `src/notion_mcp/routes/`：内部 REST 原型兼容代码，不是公开 server CLI 入口，也不是最终 MCP Tool 接口。
-- `src/notion_mcp/cli/`：git-like CLI，人类入口，调用 Core。
-- `src/notion_mcp/mcp_server/`：MCP server 和 MCP tools，Agent/LLM 结构化入口，调用 Core。
+- `src/nilo/core/`：唯一业务逻辑层，供 CLI、MCP Tool 和兼容代码复用。
+- `src/nilo/server.py` 与 `src/nilo/routes/`：内部 REST 原型兼容代码，不是公开 server CLI 入口，也不是最终 MCP Tool 接口。
+- `src/nilo/cli/`：git-like CLI，人类入口，调用 Core。
+- `src/nilo/mcp_server/`：MCP server 和 MCP tools，Agent/LLM 结构化入口，调用 Core。
 
 ## 文档入口
 

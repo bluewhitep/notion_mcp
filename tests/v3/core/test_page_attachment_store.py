@@ -3,9 +3,9 @@ from pathlib import Path
 
 import pytest
 
-from notion_mcp.core.attachments import PageAttachment, PageAttachmentStore
-from notion_mcp.core.errors import PageAttachmentNotFoundError
-from notion_mcp.core.project import ProjectConfigStore, ProjectPaths
+from nilo.core.attachments import PageAttachment, PageAttachmentStore
+from nilo.core.errors import PageAttachmentNotFoundError
+from nilo.core.project import ProjectConfigStore, ProjectPaths
 
 
 def test_page_attachment_store_saves_loads_and_deletes_state(tmp_path: Path) -> None:
@@ -24,7 +24,7 @@ def test_page_attachment_store_saves_loads_and_deletes_state(tmp_path: Path) -> 
                 }
             },
         },
-        command="notion-mcp page attach",
+        command="nilo page attach",
     )
 
     PageAttachmentStore.save(tmp_path, attachment)
@@ -56,7 +56,7 @@ def test_page_attachment_store_no_verify_state_has_limited_metadata(tmp_path: Pa
     attachment = PageAttachment.from_manual(
         page_id="page-manual",
         title="Manual Title",
-        command="notion-mcp page attach --no-verify",
+        command="nilo page attach --no-verify",
     )
 
     PageAttachmentStore.save(tmp_path, attachment)

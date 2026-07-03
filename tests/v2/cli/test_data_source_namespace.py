@@ -2,8 +2,8 @@ import json
 
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
-from notion_mcp.cli.commands import data_sources
+from nilo.cli import app
+from nilo.cli.commands import data_sources
 
 
 runner = CliRunner()

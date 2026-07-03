@@ -8,13 +8,13 @@
 
 ```text
 src/
-  notion_mcp/
+  nilo/
 ```
 
 console script：
 
 ```text
-notion-mcp = notion_mcp.cli:app
+nilo = nilo.cli:app
 ```
 
 构建后端：
@@ -76,16 +76,16 @@ Pydantic 用于配置模型和结构化输入输出。当前代码使用 Pydanti
 
 这些工具同时声明在 `dependency-groups.dev` 和 `project.optional-dependencies.dev`
 中。前者支持仓库内 `uv run pytest`、`uv run ruff check .`、`uv run mypy src`
-直接同步开发环境；后者保留 `notion-mcp[dev]` 形式的额外安装兼容性。
+直接同步开发环境；后者保留 `notion-nilo[dev]` 形式的额外安装兼容性。
 
 ## Isolated Install
 
 开发者验收命令：
 
 ```bash
-uv run --no-project --with . notion-mcp --help
-uv run --no-project --with . notion-mcp config --global --show --json
-uv run --no-project --with . notion-mcp server run --help
+uv run --no-project --with . nilo --help
+uv run --no-project --with . nilo config --global --show --json
+uv run --no-project --with . nilo server run --help
 ```
 
 ## Release Checks
@@ -96,7 +96,7 @@ uv run --no-project --with . notion-mcp server run --help
 uv run pytest -q -p no:cacheprovider
 uv run ruff check .
 uv run mypy src
-uv build --out-dir /tmp/notion-mcp-dist-check
+uv build --out-dir /tmp/notion-nilo-dist-check
 ```
 
 `ruff` 和 `mypy` 的缓存目录配置到 `/tmp`，避免在仓库中留下 `.ruff_cache/`
@@ -116,11 +116,13 @@ PyPI API token。
 
 PyPI 侧发布前必须完成：
 
-1. 在 PyPI 创建或保留 `notion-mcp` 项目名。
+1. 在 PyPI 创建或保留 `notion-nilo` 项目名。
 2. 为 GitHub 仓库配置 Trusted Publisher。
 3. Trusted Publisher 的 workflow 文件名必须匹配 `publish.yml`。
 4. Trusted Publisher 的 environment 必须匹配 `pypi`。
 5. 确认 GitHub Release tag 对应的版本已写入 `pyproject.toml`。
+
+已发布的 `notion-mcp` PyPI 项目不会被 PyPI 自动改名。如需通知旧用户，应在旧项目上单独发布迁移说明版本，并指向 `notion-nilo`。
 
 发布流程：
 

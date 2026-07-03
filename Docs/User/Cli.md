@@ -1,10 +1,10 @@
 # CLI 文档目录
 
-本文是 `notion-mcp` CLI 的使用入口。具体命令已经按主题拆分到下方分册，避免把 page、block、database、配置和高级入口混在同一个文件里。
+本文是 `nilo` CLI 的使用入口。具体命令已经按主题拆分到下方分册，避免把 page、block、database、配置和高级入口混在同一个文件里。
 
 ## 先读
 
-- [Installation](Installation.md)：安装 `notion-mcp`。
+- [Installation](Installation.md)：安装 `nilo`。
 - [Uninstallation](Uninstallation.md)：卸载命令行工具、清理 MCP client 配置、本地 token 和项目上下文。
 - [Configuration](Configuration.md)：准备 Notion connection、设置 token、创建项目级上下文。
 - [MCP Clients](MCP_Clients.md)：在 MCP 工具里配置本地 Notion MCP server。
@@ -28,10 +28,10 @@
 ## 常用起步顺序
 
 ```bash
-notion-mcp config --global user.token ntn_xxx
-notion-mcp config --global --show
-notion-mcp init --project-name "Demo"
-notion-mcp page attach <page_id>
-notion-mcp page retrieve
-notion-mcp page blocks
+nilo config --global user.token ntn_xxx
+nilo config --global --show
+nilo init --project-name "Demo"
+nilo page attach <page_id>
+nilo page retrieve
+nilo page blocks
 ```

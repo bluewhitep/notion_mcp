@@ -22,11 +22,11 @@ from uuid import uuid4
 
 import pytest
 
-from notion_mcp.core.config import CoreConfig, load_core_config, save_core_config
-from notion_mcp.core.errors import CoreError
-from notion_mcp.core.identifiers import extract_notion_uuid_from_input
-from notion_mcp.core.services.pages import extract_block_text
-from notion_mcp.mcp_server.process_manager import (
+from nilo.core.config import CoreConfig, load_core_config, save_core_config
+from nilo.core.errors import CoreError
+from nilo.core.identifiers import extract_notion_uuid_from_input
+from nilo.core.services.pages import extract_block_text
+from nilo.mcp_server.process_manager import (
     DEFAULT_TRANSPORT,
     RUNTIME_DIR_ENV,
     STREAMABLE_HTTP_PATH,
@@ -106,7 +106,7 @@ class McpHttpClient:
                     {
                         "protocolVersion": "2025-06-18",
                         "capabilities": {},
-                        "clientInfo": {"name": "notion-mcp-live-server-e2e", "version": "1.0"},
+                        "clientInfo": {"name": "nilo-live-server-e2e", "version": "1.0"},
                     },
                 )
                 self.notify("notifications/initialized")

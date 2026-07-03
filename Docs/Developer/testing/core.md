@@ -17,13 +17,13 @@
 Core focused 验证：
 
 ```bash
-env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_core uv run pytest -q -p no:cacheprovider
+env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/nilo_uv_core uv run pytest -q -p no:cacheprovider
 ```
 
 全量本地验证：
 
 ```bash
-env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/notion_mcp_uv_full uv run pytest -q -p no:cacheprovider
+env PYTHONDONTWRITEBYTECODE=1 UV_CACHE_DIR=/private/tmp/nilo_uv_full uv run pytest -q -p no:cacheprovider
 ```
 
 ## 备注

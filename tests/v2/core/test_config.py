@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from notion_mcp.core.config import (
+from nilo.core.config import (
     DEFAULT_NOTION_VERSION,
     CoreConfig,
     config_path_from_env,
@@ -15,7 +15,7 @@ from notion_mcp.core.config import (
     save_core_config,
     update_core_config,
 )
-from notion_mcp.core.errors import ConfigValidationError
+from nilo.core.errors import ConfigValidationError
 
 
 def test_init_core_config_writes_secure_file_and_defaults(

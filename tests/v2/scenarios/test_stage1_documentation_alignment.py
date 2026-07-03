@@ -25,8 +25,8 @@ def test_architecture_documents_mcp_server_as_primary_entry() -> None:
     assert "Core" in architecture
     assert "CLI" in architecture
     assert "MCP Tool" in architecture
-    assert "notion-mcp server run" in architecture
-    assert "notion-mcp server stdio" in architecture
+    assert "nilo server run" in architecture
+    assert "nilo server stdio" in architecture
 
 
 def test_design_documents_core_cli_mcp_call_boundaries() -> None:

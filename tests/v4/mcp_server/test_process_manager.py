@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from notion_mcp.mcp_server import process_manager
+from nilo.mcp_server import process_manager
 
 
 class FakeProcess:
@@ -34,7 +34,7 @@ def test_start_background_server_writes_state(monkeypatch, tmp_path: Path) -> No
     assert state.pid == 4321
     assert raw["url"] == "http://127.0.0.1:8123/mcp"
     assert raw["transport"] == "streamable-http"
-    assert "notion_mcp.mcp_server.runner" in captured["command"]
+    assert "nilo.mcp_server.runner" in captured["command"]
     assert captured["kwargs"]["start_new_session"] is True
 
 
@@ -49,7 +49,7 @@ def test_stop_background_server_marks_state_stopped(monkeypatch, tmp_path: Path)
         state_file=str(tmp_path / "server.state.json"),
         log_file=str(tmp_path / "server.log"),
         started_at="2026-06-09T00:00:00Z",
-        command=["python", "-m", "notion_mcp.mcp_server.runner"],
+        command=["python", "-m", "nilo.mcp_server.runner"],
     )
     process_manager.write_json_atomic(tmp_path / "server.state.json", state.to_dict())
     monkeypatch.setenv("NOTION_MCP_RUNTIME_DIR", str(tmp_path))
@@ -82,7 +82,7 @@ def test_stop_background_server_wraps_permission_error(monkeypatch, tmp_path: Pa
         state_file=str(tmp_path / "server.state.json"),
         log_file=str(tmp_path / "server.log"),
         started_at="2026-06-09T00:00:00Z",
-        command=["python", "-m", "notion_mcp.mcp_server.runner"],
+        command=["python", "-m", "nilo.mcp_server.runner"],
     )
     process_manager.write_json_atomic(tmp_path / "server.state.json", state.to_dict())
     monkeypatch.setenv("NOTION_MCP_RUNTIME_DIR", str(tmp_path))

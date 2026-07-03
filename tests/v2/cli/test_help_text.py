@@ -1,6 +1,6 @@
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
+from nilo.cli import app
 
 from .helpers import plain_cli_output
 

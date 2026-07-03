@@ -20,9 +20,9 @@ MCP client 使用说明见 [MCP Clients](MCP_Clients.md)。
 推荐使用 uv 从仓库根目录安装：
 
 ```bash
-cd /path/to/notion_mcp_project
+cd /path/to/notion-nilo
 uv tool install .
-notion-mcp --help
+nilo --help
 ```
 
 如果本机没有安装 `uv`，可以使用 `pip` 从本地路径安装。
@@ -36,14 +36,14 @@ notion-mcp --help
 
 ```bash
 # 设置全局 token 和可选用户名
-notion-mcp config --global user.token ntn_xxx
-notion-mcp config --global user.name Ada
+nilo config --global user.token ntn_xxx
+nilo config --global user.name Ada
 
 # 查看保存的配置和 token 状态
-notion-mcp config --global --show --json
+nilo config --global --show --json
 
 # 查看当前 token 对应的 Notion identity
-notion-mcp auth whoami --json
+nilo auth whoami --json
 ```
 
 配置文件默认存储在 `~/.notion_mcp/config.json`。可以通过环境变量 `NOTION_MCP_CONFIG` 指定其他路径。
@@ -53,14 +53,14 @@ notion-mcp auth whoami --json
 如果 MCP client 使用命令型 stdio server，配置为：
 
 ```bash
-notion-mcp server stdio
+nilo server stdio
 ```
 
 如果 MCP client 支持 streamable-http URL，可以后台启动本地 server：
 
 ```bash
-notion-mcp server run --host 127.0.0.1 --port 8000
-notion-mcp server status
+nilo server run --host 127.0.0.1 --port 8000
+nilo server status
 ```
 
 MCP client 配置说明见 [MCP Clients](MCP_Clients.md)。
@@ -70,9 +70,9 @@ MCP client 配置说明见 [MCP Clients](MCP_Clients.md)。
 CLI 示例：
 
 ```bash
-notion-mcp page retrieve <page_id> --json
-notion-mcp data-source query <data_source_id> --json
-notion-mcp block children <block_id> --json
+nilo page retrieve <page_id> --json
+nilo data-source query <data_source_id> --json
+nilo block children <block_id> --json
 ```
 
 ## 常见问题
@@ -82,12 +82,12 @@ notion-mcp block children <block_id> --json
 这是因为在调用接口前还没有设置全局 token。请运行：
 
 ```bash
-notion-mcp config --global user.token ntn_xxx
+nilo config --global user.token ntn_xxx
 ```
 
 ### 2. 是否需要填写 Notion 用户 UUID？
 
-普通用户不需要手动填写。需要排查当前 token 身份时，运行 `notion-mcp auth whoami --json` 查看返回的 `user_id`。
+普通用户不需要手动填写。需要排查当前 token 身份时，运行 `nilo auth whoami --json` 查看返回的 `user_id`。
 
 ### 3. 是否支持 OAuth 授权？
 

@@ -2,9 +2,9 @@ import json
 
 import pytest
 
-from notion_mcp.core.attachments import DatabaseAttachment, DatabaseAttachmentStore
-from notion_mcp.core.errors import DatabaseAttachmentNotFoundError
-from notion_mcp.core.project import ProjectResolver
+from nilo.core.attachments import DatabaseAttachment, DatabaseAttachmentStore
+from nilo.core.errors import DatabaseAttachmentNotFoundError
+from nilo.core.project import ProjectResolver
 
 
 def test_database_attachment_store_save_load_and_delete(tmp_path) -> None:
@@ -12,7 +12,7 @@ def test_database_attachment_store_save_load_and_delete(tmp_path) -> None:
     attachment = DatabaseAttachment.from_manual(
         database_id="db-1",
         title="Project Database",
-        command="notion-mcp database attach --no-verify",
+        command="nilo database attach --no-verify",
     )
 
     DatabaseAttachmentStore.save(tmp_path, attachment)

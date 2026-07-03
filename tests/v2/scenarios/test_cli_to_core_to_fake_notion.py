@@ -2,9 +2,9 @@ import json
 
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
-from notion_mcp.cli.commands import pages as page_commands
-from notion_mcp.core.services.pages import PagesService
+from nilo.cli import app
+from nilo.cli.commands import pages as page_commands
+from nilo.core.services.pages import PagesService
 from tests.v2.fixtures.fake_notion import FakeNotionClient
 
 

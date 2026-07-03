@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from notion_mcp.cli import app
-from notion_mcp.cli.commands import auth as auth_commands
+from nilo.cli import app
+from nilo.cli.commands import auth as auth_commands
 from tests.v2.fixtures.fake_notion import FakeNotionClient
 
 

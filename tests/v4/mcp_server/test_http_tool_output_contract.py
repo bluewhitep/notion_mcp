@@ -1,6 +1,6 @@
 import pytest
 
-from notion_mcp.mcp_server.server import create_mcp_server
+from nilo.mcp_server.server import create_mcp_server
 
 
 @pytest.mark.asyncio

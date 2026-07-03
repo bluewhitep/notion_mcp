@@ -2,10 +2,10 @@ import importlib
 
 import pytest
 
-from notion_mcp.core.errors import NotionOperationError
-from notion_mcp.core.services.blocks import BlocksService
-from notion_mcp.core.services.pages import PagesService
-from notion_mcp.core.services.raw_api import RawNotionService, registered_operations
+from nilo.core.errors import NotionOperationError
+from nilo.core.services.blocks import BlocksService
+from nilo.core.services.pages import PagesService
+from nilo.core.services.raw_api import RawNotionService, registered_operations
 
 
 class Recorder:
@@ -129,7 +129,7 @@ def test_service_modules_do_not_import_cli_or_mcp_layers() -> None:
     ]
 
     for module_name in modules:
-        module = importlib.import_module(f"notion_mcp.core.services.{module_name}")
+        module = importlib.import_module(f"nilo.core.services.{module_name}")
         source = getattr(module, "__file__", "")
         assert "/cli/" not in source
         assert "/mcp_server/" not in source

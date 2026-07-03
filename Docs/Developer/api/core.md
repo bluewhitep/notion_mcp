@@ -1,10 +1,10 @@
 # Core API
 
-本文档面向开发者，记录 `src/notion_mcp/core/` 当前已经实现的 Core 能力。Core 是唯一业务逻辑层，CLI 和 MCP Tool 都应调用 Core，而不是直接调用 Notion SDK。
+本文档面向开发者，记录 `src/nilo/core/` 当前已经实现的 Core 能力。Core 是唯一业务逻辑层，CLI 和 MCP Tool 都应调用 Core，而不是直接调用 Notion SDK。
 
 ## 配置
 
-模块：`src/notion_mcp/core/config.py`
+模块：`src/nilo/core/config.py`
 
 - `CoreConfig`
   - 保存 `notion_token`、`user_name`、`user_id`、`notion_version`、`timeout_ms`、`retry`、`default_transport` 和 `audit_enabled`。
@@ -22,7 +22,7 @@
 
 ## 错误模型
 
-模块：`src/notion_mcp/core/errors.py`
+模块：`src/nilo/core/errors.py`
 
 - `CoreError`
   - 所有 Core 错误的基类。
@@ -36,7 +36,7 @@ CLI JSON 输出和 MCP tool 响应应复用这些错误结构。
 
 ## Notion SDK Client
 
-模块：`src/notion_mcp/core/client.py`
+模块：`src/nilo/core/client.py`
 
 - `NotionClientFactory`
   - 从 `CoreConfig` 创建 Notion SDK client。
@@ -47,7 +47,7 @@ CLI JSON 输出和 MCP tool 响应应复用这些错误结构。
 
 ## 认证
 
-模块：`src/notion_mcp/core/auth.py`
+模块：`src/nilo/core/auth.py`
 
 - `AuthService.validate(...)`
   - 调用 `client.users.me()` 校验 token。
@@ -56,7 +56,7 @@ CLI JSON 输出和 MCP tool 响应应复用这些错误结构。
 
 ## 审计
 
-模块：`src/notion_mcp/core/audit.py`
+模块：`src/nilo/core/audit.py`
 
 - `AuditRecorder.record(...)`
   - 写入 JSONL 审计记录。
@@ -65,7 +65,7 @@ CLI JSON 输出和 MCP tool 响应应复用这些错误结构。
 
 ## Notion 对象域服务
 
-目录：`src/notion_mcp/core/services/`
+目录：`src/nilo/core/services/`
 
 当前已按对象域建立服务模块：
 
@@ -85,7 +85,7 @@ CLI JSON 输出和 MCP tool 响应应复用这些错误结构。
 
 ## Raw API
 
-模块：`src/notion_mcp/core/services/raw_api.py`
+模块：`src/nilo/core/services/raw_api.py`
 
 - `registered_operations()`
   - 返回允许 pass-through 的 Notion SDK 操作名。

@@ -4,12 +4,12 @@
 
 ## Notion 侧准备
 
-在配置 `notion-mcp` 之前，先在 Notion 中创建一个 internal connection，并把它授权到要操作的 page 或 database。
+在配置 `nilo` 之前，先在 Notion 中创建一个 internal connection，并把它授权到要操作的 page 或 database。
 
 1. 创建 Notion internal connection。
    - 打开 Notion Developer portal。
    - 在 Build / Internal connections 中创建新的 connection。
-   - 填写 `Connection name`，例如 `notion-mcp-local`。这个名称会出现在 Notion 页面右上角 Connections / Add connection 的列表中。
+   - 填写 `Connection name`，例如 `nilo-local`。这个名称会出现在 Notion 页面右上角 Connections / Add connection 的列表中。
    - `Authentication method` 选择 `Access token`。这个项目使用 Notion bearer token，不使用 `OAuth`。
    - 选择要使用的 workspace。
    - 在 Configuration 页复制 Installation access token。
@@ -25,7 +25,7 @@
      - `Insert comments`：向 pages 和 blocks 添加 comments。创建 comment 或 reply comment 时需要开启。
    - User capabilities：
      - `No user information`：不允许读取 user 信息。
-     - `Read user information without email addresses`：读取基础 user profile，不包含 email。通常足够用于 `notion-mcp auth whoami` 和身份校验。
+     - `Read user information without email addresses`：读取基础 user profile，不包含 email。通常足够用于 `nilo auth whoami` 和身份校验。
      - `Read user information including email addresses`：读取包含 email 的 user profile。只有确实需要 email 时才开启。
 
 3. 把 connection 授权到目标 page 或 database。
@@ -42,8 +42,8 @@
    - CLI 的 `<page_id>` 参数也可以直接传 Notion URL 或 Markdown 链接，例如：
 
 ```bash
-notion-mcp page attach "https://www.notion.so/Notion-MCP-3799a1afb97a80489bb0e7384f334958?source=copy_link"
-notion-mcp page retrieve "[Notion MCP](https://www.notion.so/Notion-MCP-3799a1afb97a80489bb0e7384f334958?source=copy_link)"
+nilo page attach "https://www.notion.so/Notion-MCP-3799a1afb97a80489bb0e7384f334958?source=copy_link"
+nilo page retrieve "[Notion MCP](https://www.notion.so/Notion-MCP-3799a1afb97a80489bb0e7384f334958?source=copy_link)"
 ```
 
    - CLI 会自动解析出 page id，并保存为带连字符的 UUID。
@@ -59,7 +59,7 @@ notion-mcp page retrieve "[Notion MCP](https://www.notion.so/Notion-MCP-3799a1af
    - 已配置 token 并授权 database 后，可运行：
 
 ```bash
-notion-mcp database sources <database_id>
+nilo database sources <database_id>
 ```
 
    - 也可以从 Notion UI 的 Manage data sources 菜单复制 data source id。
@@ -70,13 +70,13 @@ notion-mcp database sources <database_id>
    - 先写入全局 token，再调用 `auth whoami`：
 
 ```bash
-notion-mcp config --global user.token ntn_xxx
-notion-mcp auth whoami --json
+nilo config --global user.token ntn_xxx
+nilo auth whoami --json
 ```
 
    - JSON 输出中的 `user_id` 是当前 token 对应的 Notion identity id，仅用于排查和审计理解。
    - internal connection 通常返回 bot user id。
-   - `notion-mcp auth validate` 会验证 token 是否可用。
+   - `nilo auth validate` 会验证 token 是否可用。
 
 参考官方文档：
 
@@ -96,16 +96,16 @@ notion-mcp auth whoami --json
 也可以通过环境变量指定其他路径：
 
 ```bash
-NOTION_MCP_CONFIG=/path/to/config.json notion-mcp config --global --show
+NOTION_MCP_CONFIG=/path/to/config.json nilo config --global --show
 ```
 
 常用命令：
 
 ```bash
-notion-mcp config --global user.token ntn_xxx
-notion-mcp config --global user.name "Ada"
-notion-mcp config --global --show
-notion-mcp config --global --show --json
+nilo config --global user.token ntn_xxx
+nilo config --global user.name "Ada"
+nilo config --global --show
+nilo config --global --show --json
 ```
 
 `config --global --show` 会显示：
@@ -132,16 +132,16 @@ notion-mcp config --global --show --json
 初始化当前目录：
 
 ```bash
-notion-mcp init --project-name "Demo"
-notion-mcp init --workspace-hint "Team Workspace" --json
+nilo init --project-name "Demo"
+nilo init --workspace-hint "Team Workspace" --json
 ```
 
 查看当前项目配置：
 
 ```bash
-notion-mcp config --local --show
-notion-mcp config --local --show --json
-notion-mcp pwd
+nilo config --local --show
+nilo config --local --show --json
+nilo pwd
 ```
 
 项目级配置示例：
@@ -164,22 +164,22 @@ notion-mcp pwd
 `page attach` 用于绑定当前项目默认 page，不是上传文件附件。
 
 ```bash
-notion-mcp page attach <page_id>
-notion-mcp page status
-notion-mcp page retrieve
-notion-mcp page blocks
+nilo page attach <page_id>
+nilo page status
+nilo page retrieve
+nilo page blocks
 ```
 
 取消绑定：
 
 ```bash
-notion-mcp page detach
+nilo page detach
 ```
 
 刷新本地状态：
 
 ```bash
-notion-mcp page refresh
+nilo page refresh
 ```
 
 `page refresh` 只重新从 Notion 拉取标题、URL 和状态并更新本地状态，不修改 Notion 远端 page。
@@ -189,22 +189,22 @@ notion-mcp page refresh
 Database 是容器，data source 是容器下的具体表。database attach 状态会保存当前绑定 database 和 active data source。
 
 ```bash
-notion-mcp database attach <database_id>
-notion-mcp database attach <database_id> --data-source <data_source_id_or_name>
-notion-mcp database status
-notion-mcp database query --payload '{"page_size": 10}'
+nilo database attach <database_id>
+nilo database attach <database_id> --data-source <data_source_id_or_name>
+nilo database status
+nilo database query --payload '{"page_size": 10}'
 ```
 
 取消绑定：
 
 ```bash
-notion-mcp database detach
+nilo database detach
 ```
 
 刷新本地状态：
 
 ```bash
-notion-mcp database refresh
+nilo database refresh
 ```
 
 `database refresh` 只重新从 Notion 拉取 database 标题、URL、data sources 和状态并更新本地状态，不修改 Notion 远端 database。
@@ -214,40 +214,40 @@ notion-mcp database refresh
 设置全局 token 并初始化当前仓库：
 
 ```bash
-notion-mcp config --global user.token ntn_xxx
-notion-mcp config --global user.name "Ada"
-notion-mcp config --global --show
-notion-mcp init --project-name "Demo"
-notion-mcp config --local --show
+nilo config --global user.token ntn_xxx
+nilo config --global user.name "Ada"
+nilo config --global --show
+nilo init --project-name "Demo"
+nilo config --local --show
 ```
 
 绑定 page 后读取页面：
 
 ```bash
-notion-mcp page attach <page_id>
-notion-mcp page retrieve
-notion-mcp page blocks --tree
+nilo page attach <page_id>
+nilo page retrieve
+nilo page blocks --tree
 ```
 
 绑定 database 后查询 active data source：
 
 ```bash
-notion-mcp database attach <database_id> --data-source Tasks
-notion-mcp database sources
-notion-mcp database query --payload '{"page_size": 10}'
+nilo database attach <database_id> --data-source Tasks
+nilo database sources
+nilo database query --payload '{"page_size": 10}'
 ```
 
 显式操作 data source：
 
 ```bash
-notion-mcp data-source query <data_source_id> --payload '{"page_size": 10}'
-notion-mcp data-source property rename <data_source_id> Status State
+nilo data-source query <data_source_id> --payload '{"page_size": 10}'
+nilo data-source property rename <data_source_id> Status State
 ```
 
 配置命令统一使用：
 
 ```bash
-notion-mcp config --global user.token ntn_xxx
-notion-mcp config --global user.name "Ada"
-notion-mcp config --global --show
+nilo config --global user.token ntn_xxx
+nilo config --global user.name "Ada"
+nilo config --global --show
 ```

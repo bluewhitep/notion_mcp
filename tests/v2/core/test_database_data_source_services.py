@@ -1,5 +1,5 @@
-from notion_mcp.core.services.data_sources import DataSourcesService
-from notion_mcp.core.services.databases import DatabasesService
+from nilo.core.services.data_sources import DataSourcesService
+from nilo.core.services.databases import DatabasesService
 
 
 class Recorder:

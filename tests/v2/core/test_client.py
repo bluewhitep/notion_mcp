@@ -2,9 +2,9 @@ import uuid
 
 import pytest
 
-from notion_mcp.core.client import NotionClientFactory
-from notion_mcp.core.config import DEFAULT_NOTION_VERSION, CoreConfig
-from notion_mcp.core.errors import ConfigValidationError
+from nilo.core.client import NotionClientFactory
+from nilo.core.config import DEFAULT_NOTION_VERSION, CoreConfig
+from nilo.core.errors import ConfigValidationError
 
 
 class FakeNotionClient:

@@ -4,13 +4,13 @@
 
 Report non-sensitive bugs and support issues through GitHub issues:
 
-https://github.com/bluewhitep/notion_mcp/issues
+https://github.com/bluewhitep/notion-nilo/issues
 
 Do not open a public issue for secrets, token exposure, privilege escalation,
 remote execution, authentication bypass, or other sensitive security reports.
 For sensitive reports, use GitHub private vulnerability reporting:
 
-https://github.com/bluewhitep/notion_mcp/security/advisories/new
+https://github.com/bluewhitep/notion-nilo/security/advisories/new
 
 If private vulnerability reporting is not enabled or unavailable, open a public
 issue requesting a private maintainer contact channel, but do not include

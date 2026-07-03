@@ -2,9 +2,9 @@ import os
 
 import pytest
 
-from notion_mcp.core.auth import AuthService
-from notion_mcp.core.client import create_notion_client
-from notion_mcp.core.config import CoreConfig
+from nilo.core.auth import AuthService
+from nilo.core.client import create_notion_client
+from nilo.core.config import CoreConfig
 
 
 pytestmark = pytest.mark.live

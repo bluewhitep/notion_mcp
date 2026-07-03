@@ -2,9 +2,9 @@ import json
 
 import pytest
 
-from notion_mcp.core.services.pages import PagesService
-from notion_mcp.mcp_server.server import create_mcp_server
-from notion_mcp.mcp_server.tools import pages as page_tools
+from nilo.core.services.pages import PagesService
+from nilo.mcp_server.server import create_mcp_server
+from nilo.mcp_server.tools import pages as page_tools
 from tests.v2.fixtures.fake_notion import FakeNotionClient
 
 
