@@ -4,6 +4,8 @@
 
 N.I.L.O. - Notion Interfaces, Locally Operated - provides a local Notion runtime with a Core + CLI + MCP Tool architecture.
 
+Web docs: [bluewhitep.github.io/notion-nilo](https://bluewhitep.github.io/notion-nilo/)
+
 ## Status
 
 - Core is the only business logic layer.
