@@ -11,11 +11,6 @@
 - [CLI API](api/cli.md)
 - [MCP tool 契约](mcp_tools/README.md)
 
-## 参考
-
-- [打包与发布](packaging.md)
-- [Skills 模板库](Reference/Skills/README.md)
-
 ## 测试
 
 - [测试策略](testing/strategy.md)

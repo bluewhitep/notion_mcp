@@ -98,7 +98,7 @@ nilo = "nilo.cli:app"
 Homepage = "https://github.com/bluewhitep/notion-nilo"
 Repository = "https://github.com/bluewhitep/notion-nilo"
 Issues = "https://github.com/bluewhitep/notion-nilo/issues"
-Documentation = "https://github.com/bluewhitep/notion-nilo/tree/main/Docs"
+Documentation = "https://bluewhitep.github.io/notion-nilo/"
 
 [tool.ruff]
 line-length = 120

@@ -46,5 +46,8 @@ jobs:
       - name: Run mypy
         run: uv run mypy src
 
+      - name: Build docs site
+        run: python scripts/build_docs_site.py --source Docs --output /tmp/notion-nilo-docs-site
+
       - name: Build package
         run: uv build --out-dir /tmp/notion-nilo-dist

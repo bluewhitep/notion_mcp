@@ -1,6 +1,6 @@
 # N.I.L.O.
 
-[![CI](https://github.com/bluewhitep/notion-nilo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bluewhitep/notion-nilo/actions/workflows/ci.yml) [![Python](https://img.shields.io/badge/python-%3E%3D3.10-blue.svg)](pyproject.toml) [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE) [![Status](https://img.shields.io/badge/status-alpha-orange.svg)](#status) [![Docs](https://img.shields.io/badge/docs-EN%20%7C%20ZH%20%7C%20JP-blue.svg)](Docs/README.md)
+[![CI](https://github.com/bluewhitep/notion-nilo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bluewhitep/notion-nilo/actions/workflows/ci.yml) [![Python](https://img.shields.io/badge/python-%3E%3D3.10-blue.svg)](pyproject.toml) [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE) [![Status](https://img.shields.io/badge/status-alpha-orange.svg)](#status) [![Docs](https://img.shields.io/badge/docs-EN%20%7C%20JP%20%7C%20ZH-blue.svg)](https://bluewhitep.github.io/notion-nilo/)
 
 N.I.L.O. - Notion Interfaces, Locally Operated - provides a local Notion runtime with a Core + CLI + MCP Tool architecture.
 
@@ -55,20 +55,23 @@ Existing `.notion_mcp/` project context directories and `NOTION_MCP_*` environme
 
 ## Documentation
 
-Documentation is organized by language:
+Web documentation is deployed with GitHub Pages:
 
-- [English](Docs/EN/README.md)
+- [Documentation site](https://bluewhitep.github.io/notion-nilo/)
+
+Repository documentation is organized by language. The Chinese tree is the source for content decisions:
+
 - [中文](Docs/ZH/README.md)
+- [English](Docs/EN/README.md)
 - [日本語](Docs/JP/README.md)
 
-Primary English entrypoints:
+Common English entrypoints:
 
 - [Installation](Docs/EN/User/Installation.md)
 - [Configuration](Docs/EN/User/Configuration.md)
 - [MCP client setup](Docs/EN/User/MCP_Clients.md)
 - [CLI reference](Docs/EN/User/Cli.md)
 - [Troubleshooting](Docs/EN/User/Troubleshooting.md)
-- [Developer packaging notes](Docs/EN/Developer/packaging.md)
 
 ## Roadmap
 

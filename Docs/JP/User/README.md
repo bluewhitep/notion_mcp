@@ -26,6 +26,7 @@
 - [Search と Custom Emoji CLI](Cli/Search_And_Custom_Emoji.md)
 - [Raw API CLI](Cli/Raw_API.md)
 - [MCP Server CLI](Cli/MCP_Server.md)
+- [Skills テンプレートライブラリ](../Developer/Reference/Skills/README.md)
 
 ## トラブルシューティング
 

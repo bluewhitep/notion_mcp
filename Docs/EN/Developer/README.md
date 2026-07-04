@@ -11,11 +11,6 @@
 - [CLI API](api/cli.md)
 - [MCP tool contracts](mcp_tools/README.md)
 
-## Reference
-
-- [Packaging](packaging.md)
-- [Skills template library](Reference/Skills/README.md)
-
 ## Testing
 
 - [Testing strategy](testing/strategy.md)

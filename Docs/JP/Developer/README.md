@@ -11,11 +11,6 @@
 - [CLI API](api/cli.md)
 - [MCP tool 契約](mcp_tools/README.md)
 
-## リファレンス
-
-- [パッケージングとリリース](packaging.md)
-- [Skills テンプレートライブラリ](Reference/Skills/README.md)
-
 ## テスト
 
 - [テスト戦略](testing/strategy.md)
