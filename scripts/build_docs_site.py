@@ -37,15 +37,15 @@ EXCLUDED_PAGE_PREFIXES = (
 NAV_LABELS = {
     "EN": {
         "home": "English documentation",
-        "User": "User documentation",
-        "Developer": "Developer documentation",
-        "Other": "Other documentation",
-        "user_overview": "Overview",
-        "user_setup": "Setup and connection",
-        "user_support": "Maintenance and troubleshooting",
+        "User": "User",
+        "Developer": "Developer",
+        "Other": "Project records",
+        "user_overview": "",
+        "user_setup": "Getting started and setup",
+        "user_support": "Support and maintenance",
         "user_cli": "CLI reference",
         "user_skills": "Skills template library",
-        "developer_overview": "Overview",
+        "developer_overview": "",
         "developer_api": "API",
         "developer_mcp_tools": "MCP tools",
         "developer_testing": "Testing",
@@ -54,15 +54,15 @@ NAV_LABELS = {
     },
     "JP": {
         "home": "日本語ドキュメント",
-        "User": "ユーザードキュメント",
-        "Developer": "開発者ドキュメント",
-        "Other": "その他のドキュメント",
-        "user_overview": "概要",
-        "user_setup": "セットアップと接続",
-        "user_support": "保守とトラブルシューティング",
+        "User": "ユーザー",
+        "Developer": "開発者",
+        "Other": "プロジェクト記録",
+        "user_overview": "",
+        "user_setup": "はじめにと設定",
+        "user_support": "サポートと保守",
         "user_cli": "CLI リファレンス",
         "user_skills": "Skills テンプレートライブラリ",
-        "developer_overview": "概要",
+        "developer_overview": "",
         "developer_api": "API",
         "developer_mcp_tools": "MCP ツール",
         "developer_testing": "テスト",
@@ -71,15 +71,15 @@ NAV_LABELS = {
     },
     "ZH": {
         "home": "中文文档",
-        "User": "用户文档",
-        "Developer": "开发者文档",
-        "Other": "其他文档",
-        "user_overview": "概览",
-        "user_setup": "安装与连接",
-        "user_support": "维护与故障排查",
+        "User": "用户",
+        "Developer": "开发者",
+        "Other": "项目记录",
+        "user_overview": "",
+        "user_setup": "入门与配置",
+        "user_support": "支持与维护",
         "user_cli": "CLI 参考",
         "user_skills": "Skills 模板库",
-        "developer_overview": "概览",
+        "developer_overview": "",
         "developer_api": "API",
         "developer_mcp_tools": "MCP 工具",
         "developer_testing": "测试",
@@ -94,7 +94,7 @@ NAV_GROUPS = (
             ("user_overview", False, ("User/README.md",), ()),
             (
                 "user_setup",
-                False,
+                True,
                 (
                     "User/Guide.md",
                     "User/Installation.md",
@@ -718,6 +718,8 @@ def render_nav_group(
         render_nav_link(page, target, nav_depth(target, prefixes))
         for target in targets
     )
+    if not label:
+        return links
     if collapsible:
         open_attr = " open" if any(target.source_path == page.source_path for target in targets) else ""
         return (
