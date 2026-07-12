@@ -20,6 +20,8 @@ from nilo.cli.errors import JsonErrorGroup
 from nilo.cli.formatting import exit_with_error
 from nilo.core.errors import CoreError
 
+from .helpers import plain_cli_output
+
 runner = CliRunner()
 
 
@@ -94,12 +96,13 @@ def test_invalid_json_payload_is_a_structured_error_through_aliases() -> None:
 # --------------------------------
 def test_non_json_usage_error_keeps_human_output() -> None:
     result = runner.invoke(app, ["page", "update"])
+    stderr = plain_cli_output(result.stderr)
     assert result.exit_code == 2
     assert result.stdout == ""
-    assert result.stderr.startswith("Usage:")
-    assert "Missing argument 'PAGE_ID'." in result.stderr
+    assert stderr.startswith("Usage:")
+    assert "Missing argument 'PAGE_ID'." in stderr
     with pytest.raises(json.JSONDecodeError):
-        json.loads(result.stderr)
+        json.loads(stderr)
 
 
 # --------------------------------
