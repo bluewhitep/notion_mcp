@@ -13,8 +13,8 @@ def test_uv_installed_package_imports_outside_repo_cwd(tmp_path: Path) -> None:
     assert uv is not None, "uv is required for packaging validation"
 
     repo_root = Path(__file__).resolve().parents[3]
-    with (repo_root / "pyproject.toml").open("rb") as pyproject_file:
-        expected_version = tomllib.load(pyproject_file)["project"]["version"]
+    pyproject_text = (repo_root / "pyproject.toml").read_text(encoding="utf-8")
+    expected_version = tomllib.loads(pyproject_text)["project"]["version"]
     run_cwd = tmp_path / "outside-repo"
     run_cwd.mkdir()
     env = os.environ.copy()
